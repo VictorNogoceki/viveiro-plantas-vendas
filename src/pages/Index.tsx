@@ -1,5 +1,4 @@
-
-import { Leaf, Users, Package, ShoppingCart, FileText, BarChart3 } from "lucide-react";
+import { Leaf, Users, Package, ShoppingCart, FileText, BarChart3, ClipboardList } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -18,6 +17,13 @@ const Index = () => {
       icon: Package,
       path: "/produtos",
       color: "bg-green-100 text-green-600"
+    },
+    {
+      title: "Pedidos",
+      description: "Gerencie pedidos de clientes",
+      icon: ClipboardList,
+      path: "/pedidos",
+      color: "bg-yellow-100 text-yellow-600"
     },
     {
       title: "Registro de Vendas",
