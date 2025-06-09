@@ -54,21 +54,15 @@ export function AppSidebar() {
   const location = useLocation();
 
   return (
-    <Sidebar className="bg-viveiro-gray border-r-2 border-viveiro-green">
+    <Sidebar>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className="text-viveiro-gray-dark text-lg font-bold mb-4">
-            Viveiro <span className="text-viveiro-yellow">EBENEZER</span>
-          </SidebarGroupLabel>
+          <SidebarGroupLabel>Viveiro - Sistema de Gestão</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton 
-                    asChild 
-                    isActive={location.pathname === item.url}
-                    className="text-viveiro-gray-dark hover:bg-viveiro-green hover:text-white border border-viveiro-green/20"
-                  >
+                  <SidebarMenuButton asChild isActive={location.pathname === item.url}>
                     <Link to={item.url}>
                       <item.icon />
                       <span>{item.title}</span>
