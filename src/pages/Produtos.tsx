@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Package, Plus, Leaf } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -21,26 +21,7 @@ interface Produto {
 }
 
 const Produtos = () => {
-  const [produtos, setProdutos] = useState<Produto[]>([
-    {
-      id: 1,
-      nome: "Rosa Vermelha",
-      especie: "Rosa rubiginosa",
-      categoria: "Flores",
-      quantidade: 50,
-      preco: 15.90,
-      descricao: "Rosa vermelha linda para jardim"
-    },
-    {
-      id: 2,
-      nome: "Samambaia",
-      especie: "Nephrolepis exaltata",
-      categoria: "Folhagem",
-      quantidade: 30,
-      preco: 25.00,
-      descricao: "Samambaia ideal para ambientes internos"
-    }
-  ]);
+  const [produtos, setProdutos] = useState<Produto[]>([]);
   
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
@@ -54,8 +35,81 @@ const Produtos = () => {
 
   const { toast } = useToast();
 
+  // Carregar produtos do localStorage quando o componente montar
+  useEffect(() => {
+    const produtosSalvos = localStorage.getItem('viveiro-produtos');
+    if (produtosSalvos) {
+      try {
+        const produtos = JSON.parse(produtosSalvos);
+        setProdutos(produtos);
+        console.log('Produtos carregados do localStorage:', produtos);
+      } catch (error) {
+        console.error('Erro ao carregar produtos do localStorage:', error);
+        // Produtos iniciais se houver erro
+        const produtosIniciais = [
+          {
+            id: 1,
+            nome: "Rosa Vermelha",
+            especie: "Rosa rubiginosa",
+            categoria: "Flores",
+            quantidade: 50,
+            preco: 15.90,
+            descricao: "Rosa vermelha linda para jardim"
+          },
+          {
+            id: 2,
+            nome: "Samambaia",
+            especie: "Nephrolepis exaltata",
+            categoria: "Folhagem",
+            quantidade: 30,
+            preco: 25.00,
+            descricao: "Samambaia ideal para ambientes internos"
+          }
+        ];
+        setProdutos(produtosIniciais);
+        localStorage.setItem('viveiro-produtos', JSON.stringify(produtosIniciais));
+      }
+    } else {
+      // Produtos iniciais se não houver dados salvos
+      const produtosIniciais = [
+        {
+          id: 1,
+          nome: "Rosa Vermelha",
+          especie: "Rosa rubiginosa",
+          categoria: "Flores",
+          quantidade: 50,
+          preco: 15.90,
+          descricao: "Rosa vermelha linda para jardim"
+        },
+        {
+          id: 2,
+          nome: "Samambaia",
+          especie: "Nephrolepis exaltata",
+          categoria: "Folhagem",
+          quantidade: 30,
+          preco: 25.00,
+          descricao: "Samambaia ideal para ambientes internos"
+        }
+      ];
+      setProdutos(produtosIniciais);
+      localStorage.setItem('viveiro-produtos', JSON.stringify(produtosIniciais));
+    }
+  }, []);
+
+  // Função para salvar produtos no localStorage
+  const salvarProdutos = (novosProdutos: Produto[]) => {
+    try {
+      localStorage.setItem('viveiro-produtos', JSON.stringify(novosProdutos));
+      console.log('Produtos salvos no localStorage:', novosProdutos);
+    } catch (error) {
+      console.error('Erro ao salvar produtos no localStorage:', error);
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    console.log('Dados do formulário:', formData);
     
     if (!formData.nome || !formData.especie || !formData.quantidade || !formData.preco) {
       toast({
@@ -66,8 +120,11 @@ const Produtos = () => {
       return;
     }
 
+    // Gerar ID único baseado no timestamp
+    const novoId = Date.now();
+    
     const novoProduto: Produto = {
-      id: produtos.length + 1,
+      id: novoId,
       nome: formData.nome,
       especie: formData.especie,
       categoria: formData.categoria,
@@ -76,7 +133,15 @@ const Produtos = () => {
       descricao: formData.descricao
     };
 
-    setProdutos([...produtos, novoProduto]);
+    console.log('Novo produto criado:', novoProduto);
+
+    const produtosAtualizados = [...produtos, novoProduto];
+    setProdutos(produtosAtualizados);
+    
+    // Salvar no localStorage
+    salvarProdutos(produtosAtualizados);
+
+    // Limpar formulário
     setFormData({
       nome: '',
       especie: '',
@@ -89,8 +154,10 @@ const Produtos = () => {
 
     toast({
       title: "Sucesso",
-      description: "Produto cadastrado com sucesso!",
+      description: "Produto cadastrado e salvo com sucesso!",
     });
+
+    console.log('Lista de produtos atualizada:', produtosAtualizados);
   };
 
   return (
