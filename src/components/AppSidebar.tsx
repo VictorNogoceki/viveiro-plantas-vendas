@@ -54,7 +54,10 @@ export function AppSidebar() {
   const location = useLocation();
 
   return (
-    <Sidebar className="bg-viveiro-gray border-r-2 border-viveiro-green">
+    <Sidebar 
+      className="bg-viveiro-gray border-r-2 border-viveiro-green"
+      collapsible="icon"
+    >
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel className="text-viveiro-gray-dark text-lg font-bold mb-4">
@@ -68,6 +71,7 @@ export function AppSidebar() {
                     asChild 
                     isActive={location.pathname === item.url}
                     className="text-viveiro-gray-dark hover:bg-viveiro-green hover:text-white border border-viveiro-green/20"
+                    tooltip={item.title}
                   >
                     <Link to={item.url}>
                       <item.icon />

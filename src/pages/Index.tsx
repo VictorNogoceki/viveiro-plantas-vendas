@@ -51,19 +51,14 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-viveiro-gray">
-      <header className="bg-viveiro-gray shadow-sm border-b-2 border-viveiro-green">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center gap-3">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="text-center mb-12">
+          <div className="flex items-center justify-center gap-3 mb-4">
             <Leaf className="h-8 w-8 text-viveiro-green" />
             <h1 className="text-2xl font-bold text-viveiro-gray-dark">
               Viveiro <span className="text-viveiro-yellow">EBENEZER</span>
             </h1>
           </div>
-        </div>
-      </header>
-
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-viveiro-gray-dark mb-4">
             Bem-vindo ao Sistema de Gestão do Viveiro
           </h2>
