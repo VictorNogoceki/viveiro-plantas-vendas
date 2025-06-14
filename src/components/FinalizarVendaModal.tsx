@@ -138,13 +138,12 @@ const FinalizarVendaModal: React.FC<FinalizarVendaModalProps> = ({
                     {forma.nome}
                   </label>
                   <Input
-                    type="number"
-                    step="0.01"
-                    min="0"
+                    type="text"
                     value={forma.selecionada ? forma.valor.toFixed(2) : '0.00'}
                     onChange={(e) => handleValorChange(forma.id, e.target.value)}
                     disabled={!forma.selecionada}
                     className="w-24 text-right"
+                    onFocus={(e) => e.target.select()}
                   />
                 </div>
               ))}
