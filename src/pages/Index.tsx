@@ -1,116 +1,66 @@
 
-import { Leaf, Package, ShoppingCart, Users, DollarSign, Settings, BarChart3, AlertTriangle, Calendar, FileText, Zap, Shield } from "lucide-react";
+import { Leaf, Users, Package, ShoppingCart, TrendingUp, AlertTriangle, Calendar, DollarSign } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Link } from "react-router-dom";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, BarChart, Bar, AreaChart, Area } from "recharts";
 
 const Index = () => {
-  const modulos = [
-    {
-      titulo: "Produtos e Estoque",
-      descricao: "Gestão completa de produtos, estoque e fornecedores",
-      icone: Package,
-      cor: "bg-green-500",
-      funcionalidades: [
-        "Cadastro de produtos (nome comum, científico, categoria)",
-        "Controle de estoque com entradas e saídas",
-        "Alertas para estoque mínimo",
-        "Histórico de movimentações",
-        "Gestão de fornecedores"
-      ],
-      rota: "/produtos",
-      status: "ativo"
+  // Dados mockados para demonstração
+  const vendasData = [
+    { data: "01/06", vendas: 1200 },
+    { data: "02/06", vendas: 1800 },
+    { data: "03/06", vendas: 2400 },
+    { data: "04/06", vendas: 1600 },
+    { data: "05/06", vendas: 2800 },
+    { data: "06/06", vendas: 3200 },
+    { data: "07/06", vendas: 2900 },
+  ];
+
+  const produtosMaisVendidos = [
+    { produto: "Rosa Vermelha", vendas: 45 },
+    { produto: "Violeta", vendas: 38 },
+    { produto: "Orquídea", vendas: 32 },
+    { produto: "Suculenta Mix", vendas: 28 },
+    { produto: "Manjericão", vendas: 24 },
+  ];
+
+  const novosClientes = [
+    { periodo: "Sem 1", clientes: 12 },
+    { periodo: "Sem 2", clientes: 18 },
+    { periodo: "Sem 3", clientes: 15 },
+    { periodo: "Sem 4", clientes: 22 },
+  ];
+
+  const estoquesBaixos = [
+    { produto: "Rosa Branca", estoque: 3, minimo: 10 },
+    { produto: "Girassol", estoque: 5, minimo: 15 },
+    { produto: "Fertilizante NPK", estoque: 2, minimo: 8 },
+  ];
+
+  const ultimosPedidos = [
+    { id: "001", cliente: "Maria Santos", valor: 89.90, status: "Concluído", data: "08/06/2025" },
+    { id: "002", cliente: "João Silva", valor: 156.50, status: "Pendente", data: "08/06/2025" },
+    { id: "003", cliente: "Ana Costa", valor: 67.30, status: "Concluído", data: "07/06/2025" },
+    { id: "004", cliente: "Pedro Oliveira", valor: 234.80, status: "Em andamento", data: "07/06/2025" },
+  ];
+
+  const topClientes = [
+    { nome: "Maria Santos", compras: "R$ 1.245,90", pedidos: 8 },
+    { nome: "João Silva", compras: "R$ 987,60", pedidos: 6 },
+    { nome: "Ana Costa", compras: "R$ 756,40", pedidos: 5 },
+  ];
+
+  const chartConfig = {
+    vendas: {
+      label: "Vendas",
+      color: "#059669"
     },
-    {
-      titulo: "Vendas",
-      descricao: "PDV, orçamentos e relatórios de vendas",
-      icone: ShoppingCart,
-      cor: "bg-blue-500",
-      funcionalidades: [
-        "Registro de vendas com múltiplos produtos",
-        "PDV com suporte a código de barras",
-        "Geração de orçamentos",
-        "Impressão de recibos",
-        "Relatórios por período, produto e cliente"
-      ],
-      rota: "/vendas",
-      status: "ativo"
-    },
-    {
-      titulo: "Clientes",
-      descricao: "Cadastro e relacionamento com clientes",
-      icone: Users,
-      cor: "bg-purple-500",
-      funcionalidades: [
-        "Cadastro completo de clientes",
-        "Histórico de compras",
-        "Classificação (Frequente, Inativo, VIP)",
-        "Lista de aniversariantes",
-        "Comunicação via WhatsApp/E-mail"
-      ],
-      rota: "/clientes",
-      status: "ativo"
-    },
-    {
-      titulo: "Financeiro",
-      descricao: "Controle financeiro e fluxo de caixa",
-      icone: DollarSign,
-      cor: "bg-yellow-500",
-      funcionalidades: [
-        "Contas a pagar e receber",
-        "Fluxo de caixa diário/semanal/mensal",
-        "Integração com vendas",
-        "Emissão de recibos e boletos",
-        "Relatórios financeiros"
-      ],
-      rota: "/fluxo-caixa",
-      status: "ativo"
-    },
-    {
-      titulo: "Relatórios e Indicadores",
-      descricao: "Análises e relatórios gerenciais",
-      icone: BarChart3,
-      cor: "bg-indigo-500",
-      funcionalidades: [
-        "Gráficos de vendas mensais",
-        "Produtos mais vendidos",
-        "Clientes que mais compram",
-        "Estoque parado",
-        "Exportação PDF/Excel"
-      ],
-      rota: "/relatorios",
-      status: "ativo"
-    },
-    {
-      titulo: "Administração",
-      descricao: "Gestão de usuários e sistema",
-      icone: Settings,
-      cor: "bg-gray-500",
-      funcionalidades: [
-        "Controle de usuários e permissões",
-        "Log de atividades",
-        "Backup automático",
-        "Sistema de login",
-        "Controle de acesso por módulo"
-      ],
-      rota: "/admin",
-      status: "desenvolvimento"
+    clientes: {
+      label: "Clientes",
+      color: "#0891b2"
     }
-  ];
-
-  const alertas = [
-    { tipo: "estoque", mensagem: "5 produtos com estoque baixo", cor: "destructive" },
-    { tipo: "financeiro", mensagem: "3 contas vencendo hoje", cor: "default" },
-    { tipo: "aniversario", mensagem: "2 clientes aniversariam hoje", cor: "secondary" }
-  ];
-
-  const metricas = [
-    { titulo: "Vendas Hoje", valor: "R$ 1.245,80", variacao: "+12%", icone: ShoppingCart },
-    { titulo: "Produtos Ativos", valor: "456", variacao: "+8", icone: Package },
-    { titulo: "Clientes Cadastrados", valor: "89", variacao: "+3", icone: Users },
-    { titulo: "Saldo em Caixa", valor: "R$ 8.750,00", variacao: "+5%", icone: DollarSign }
-  ];
+  };
 
   return (
     <div className="space-y-6">
@@ -119,187 +69,235 @@ const Index = () => {
         <div className="flex items-center justify-center gap-3 mb-4">
           <Leaf className="h-8 w-8 text-viveiro-green" />
           <h1 className="text-2xl font-bold text-viveiro-gray-dark">
-            Sistema de Gestão - Viveiro <span className="text-viveiro-yellow">EBENEZER</span>
+            Dashboard - Viveiro <span className="text-viveiro-yellow">EBENEZER</span>
           </h1>
         </div>
         <p className="text-viveiro-gray-dark/70">
-          Plataforma completa para gestão do seu viveiro de plantas
+          Visão geral das vendas, estoque e clientes
         </p>
       </div>
 
-      {/* Alertas */}
-      <Card className="border-l-4 border-l-amber-500">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-amber-700">
-            <AlertTriangle className="h-5 w-5" />
-            Alertas do Sistema
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-wrap gap-2">
-            {alertas.map((alerta, index) => (
-              <Badge key={index} variant={alerta.cor as any} className="px-3 py-1">
-                {alerta.mensagem}
-              </Badge>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Métricas Rápidas */}
+      {/* Cards Resumo */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {metricas.map((metrica, index) => (
-          <Card key={index}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{metrica.titulo}</CardTitle>
-              <metrica.icone className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-viveiro-green">{metrica.valor}</div>
-              <p className="text-xs text-muted-foreground">
-                {metrica.variacao} em relação ao período anterior
-              </p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {/* Módulos do Sistema */}
-      <div className="space-y-6">
-        <h2 className="text-xl font-semibold text-viveiro-gray-dark">Módulos do Sistema</h2>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {modulos.map((modulo, index) => (
-            <Card key={index} className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-lg ${modulo.cor} text-white`}>
-                      <modulo.icone className="h-6 w-6" />
-                    </div>
-                    <div>
-                      <CardTitle className="text-lg">{modulo.titulo}</CardTitle>
-                      <CardDescription>{modulo.descricao}</CardDescription>
-                    </div>
-                  </div>
-                  <Badge variant={modulo.status === "ativo" ? "default" : "secondary"}>
-                    {modulo.status === "ativo" ? "Ativo" : "Em Desenvolvimento"}
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <h4 className="font-medium text-sm text-gray-700">Funcionalidades:</h4>
-                  <ul className="space-y-1 text-sm text-gray-600">
-                    {modulo.funcionalidades.map((func, i) => (
-                      <li key={i} className="flex items-start gap-2">
-                        <span className="w-1 h-1 rounded-full bg-viveiro-green mt-2 flex-shrink-0"></span>
-                        {func}
-                      </li>
-                    ))}
-                  </ul>
-                  <div className="pt-3">
-                    {modulo.status === "ativo" ? (
-                      <Button asChild className="w-full">
-                        <Link to={modulo.rota}>
-                          Acessar Módulo
-                        </Link>
-                      </Button>
-                    ) : (
-                      <Button disabled className="w-full">
-                        Em Desenvolvimento
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-
-      {/* Acesso Rápido */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Zap className="h-5 w-5" />
-            Acesso Rápido
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Button variant="outline" asChild>
-              <Link to="/vendas" className="flex flex-col items-center gap-2 h-auto py-4">
-                <ShoppingCart className="h-6 w-6" />
-                Nova Venda
-              </Link>
-            </Button>
-            <Button variant="outline" asChild>
-              <Link to="/produtos" className="flex flex-col items-center gap-2 h-auto py-4">
-                <Package className="h-6 w-6" />
-                Novo Produto
-              </Link>
-            </Button>
-            <Button variant="outline" asChild>
-              <Link to="/clientes" className="flex flex-col items-center gap-2 h-auto py-4">
-                <Users className="h-6 w-6" />
-                Novo Cliente
-              </Link>
-            </Button>
-            <Button variant="outline" asChild>
-              <Link to="/relatorios" className="flex flex-col items-center gap-2 h-auto py-4">
-                <BarChart3 className="h-6 w-6" />
-                Relatórios
-              </Link>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Informações do Sistema */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card>
-          <CardHeader>
-            <CardTitle className="text-sm">Suporte Técnico</CardTitle>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Vendas Totais</CardTitle>
+            <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <p className="text-xs text-muted-foreground mb-2">
-              Para dúvidas ou problemas técnicos
+            <div className="text-2xl font-bold text-viveiro-green">R$ 15.900</div>
+            <p className="text-xs text-muted-foreground">
+              +12% em relação ao mês anterior
             </p>
-            <Button size="sm" variant="outline" className="w-full">
-              Contatar Suporte
-            </Button>
           </CardContent>
         </Card>
 
         <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Pedidos Realizados</CardTitle>
+            <ShoppingCart className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-viveiro-green">127</div>
+            <p className="text-xs text-muted-foreground">
+              +8% em relação ao mês anterior
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Clientes Ativos</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-viveiro-green">89</div>
+            <p className="text-xs text-muted-foreground">
+              +15% em relação ao mês anterior
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Produtos em Estoque</CardTitle>
+            <Package className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-viveiro-green">456</div>
+            <p className="text-xs text-muted-foreground">
+              Valor total: R$ 28.450
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Gráficos */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Evolução das Vendas */}
+        <Card>
           <CardHeader>
-            <CardTitle className="text-sm flex items-center gap-2">
-              <Shield className="h-4 w-4" />
-              Backup do Sistema
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="h-5 w-5" />
+              Evolução das Vendas (7 dias)
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-xs text-muted-foreground mb-2">
-              Último backup: Hoje às 03:00
-            </p>
-            <Button size="sm" variant="outline" className="w-full">
-              Fazer Backup Manual
-            </Button>
+            <ChartContainer config={chartConfig} className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={vendasData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="data" />
+                  <YAxis />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <Line 
+                    type="monotone" 
+                    dataKey="vendas" 
+                    stroke="var(--color-vendas)" 
+                    strokeWidth={2}
+                    dot={{ fill: "var(--color-vendas)" }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </ChartContainer>
           </CardContent>
         </Card>
 
+        {/* Produtos Mais Vendidos */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm">Versão do Sistema</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <Package className="h-5 w-5" />
+              Produtos Mais Vendidos
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-xs text-muted-foreground mb-2">
-              Versão 2.1.0 - Atualizado
-            </p>
-            <Badge variant="secondary" className="text-xs">
-              Stable
-            </Badge>
+            <ChartContainer config={chartConfig} className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={produtosMaisVendidos} layout="horizontal">
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis type="number" />
+                  <YAxis dataKey="produto" type="category" width={100} />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <Bar dataKey="vendas" fill="var(--color-vendas)" />
+                </BarChart>
+              </ResponsiveContainer>
+            </ChartContainer>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Novos Clientes */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Users className="h-5 w-5" />
+            Novos Clientes por Semana
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ChartContainer config={chartConfig} className="h-[200px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={novosClientes}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="periodo" />
+                <YAxis />
+                <ChartTooltip content={<ChartTooltipContent />} />
+                <Area 
+                  type="monotone" 
+                  dataKey="clientes" 
+                  stroke="var(--color-clientes)" 
+                  fill="var(--color-clientes)"
+                  fillOpacity={0.3}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </ChartContainer>
+        </CardContent>
+      </Card>
+
+      {/* Seção Inferior */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Estoque Baixo */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-red-600">
+              <AlertTriangle className="h-5 w-5" />
+              Estoque Baixo
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {estoquesBaixos.map((item, index) => (
+                <div key={index} className="flex justify-between items-center p-2 bg-red-50 rounded">
+                  <span className="font-medium">{item.produto}</span>
+                  <span className="text-red-600 font-bold">{item.estoque} un.</span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Top Clientes */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="h-5 w-5" />
+              Top Clientes
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {topClientes.map((cliente, index) => (
+                <div key={index} className="flex justify-between items-center p-2 border rounded">
+                  <div>
+                    <p className="font-medium">{cliente.nome}</p>
+                    <p className="text-sm text-muted-foreground">{cliente.pedidos} pedidos</p>
+                  </div>
+                  <span className="font-bold text-viveiro-green">{cliente.compras}</span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Últimos Pedidos */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <ShoppingCart className="h-5 w-5" />
+              Últimos Pedidos
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Cliente</TableHead>
+                  <TableHead>Valor</TableHead>
+                  <TableHead>Status</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {ultimosPedidos.map((pedido) => (
+                  <TableRow key={pedido.id}>
+                    <TableCell className="font-medium">{pedido.cliente}</TableCell>
+                    <TableCell>R$ {pedido.valor}</TableCell>
+                    <TableCell>
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        pedido.status === 'Concluído' 
+                          ? 'bg-green-100 text-green-800'
+                          : pedido.status === 'Pendente'
+                          ? 'bg-yellow-100 text-yellow-800'
+                          : 'bg-blue-100 text-blue-800'
+                      }`}>
+                        {pedido.status}
+                      </span>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </CardContent>
         </Card>
       </div>
