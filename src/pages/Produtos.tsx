@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Package, Plus, Search, Edit, Trash2, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -37,7 +38,7 @@ const Produtos = () => {
       categoria: "Folhagem",
       estoque: 8,
       preco: 25.00,
-      imagem: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=64&h=64&fit=crop&crop=center"
+      imagem: "/lovable-uploads/4b16ca18-e502-4020-96ef-096f7dbea63d.png"
     },
     {
       id: 3,
