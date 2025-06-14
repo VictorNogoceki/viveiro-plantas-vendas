@@ -1,5 +1,5 @@
 
-import { Calendar, ClipboardList, Home, Package, Users, ShoppingCart, FileText, BarChart3, DollarSign } from "lucide-react";
+import { Calendar, ClipboardList, Home, Package, Warehouse, Users, ShoppingCart, FileText, BarChart3, DollarSign } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import {
   Sidebar,
@@ -27,6 +27,11 @@ const menuItems = [
     title: "Produtos",
     url: "/produtos",
     icon: Package,
+  },
+  {
+    title: "Estoque",
+    url: "/estoque",
+    icon: Warehouse,
   },
   {
     title: "Pedidos",

@@ -9,6 +9,7 @@ import { AppSidebar } from "@/components/AppSidebar";
 import Index from "./pages/Index";
 import Clientes from "./pages/Clientes";
 import Produtos from "./pages/Produtos";
+import Estoque from "./pages/Estoque";
 import Pedidos from "./pages/Pedidos";
 import Vendas from "./pages/Vendas";
 import NotasFiscais from "./pages/NotasFiscais";
@@ -36,6 +37,7 @@ const App = () => (
                   <Route path="/" element={<Index />} />
                   <Route path="/clientes" element={<Clientes />} />
                   <Route path="/produtos" element={<Produtos />} />
+                  <Route path="/estoque" element={<Estoque />} />
                   <Route path="/pedidos" element={<Pedidos />} />
                   <Route path="/vendas" element={<Vendas />} />
                   <Route path="/notas-fiscais" element={<NotasFiscais />} />
