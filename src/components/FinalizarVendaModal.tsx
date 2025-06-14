@@ -12,7 +12,7 @@ interface FormaPagamento {
   selecionada: boolean;
   valor: number;
   valorTexto: string;
-  editando: boolean; // Novo campo para controlar se está sendo editado
+  editando: boolean; // Campo para controlar se está sendo editado
 }
 
 interface FinalizarVendaModalProps {
