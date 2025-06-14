@@ -11,7 +11,8 @@ interface FormaPagamento {
   nome: string;
   selecionada: boolean;
   valor: number;
-  valorTexto: string; // Novo campo para armazenar o texto durante edição
+  valorTexto: string;
+  editando: boolean; // Novo campo para controlar se está sendo editado
 }
 
 interface FinalizarVendaModalProps {
@@ -28,22 +29,23 @@ const FinalizarVendaModal: React.FC<FinalizarVendaModalProps> = ({
   subtotal
 }) => {
   const [formasPagamento, setFormasPagamento] = useState<FormaPagamento[]>([
-    { id: 'dinheiro', nome: 'Dinheiro', selecionada: true, valor: subtotal, valorTexto: subtotal.toFixed(2) },
-    { id: 'cartao-credito', nome: 'Cartão de Crédito', selecionada: false, valor: 0, valorTexto: '0.00' },
-    { id: 'cartao-debito', nome: 'Cartão de Débito', selecionada: false, valor: 0, valorTexto: '0.00' },
-    { id: 'pix', nome: 'PIX', selecionada: false, valor: 0, valorTexto: '0.00' }
+    { id: 'dinheiro', nome: 'Dinheiro', selecionada: true, valor: subtotal, valorTexto: subtotal.toFixed(2), editando: false },
+    { id: 'cartao-credito', nome: 'Cartão de Crédito', selecionada: false, valor: 0, valorTexto: '0.00', editando: false },
+    { id: 'cartao-debito', nome: 'Cartão de Débito', selecionada: false, valor: 0, valorTexto: '0.00', editando: false },
+    { id: 'pix', nome: 'PIX', selecionada: false, valor: 0, valorTexto: '0.00', editando: false }
   ]);
 
-  // Recalcula os valores quando o subtotal muda
+  // Recalcula os valores quando o subtotal muda, mas apenas se não estiver editando
   useEffect(() => {
     setFormasPagamento(prev => {
       const selecionadas = prev.filter(forma => forma.selecionada);
       if (selecionadas.length === 1) {
-        return prev.map(forma => 
-          forma.selecionada 
-            ? { ...forma, valor: subtotal, valorTexto: subtotal.toFixed(2) }
-            : forma
-        );
+        return prev.map(forma => {
+          if (forma.selecionada && !forma.editando) {
+            return { ...forma, valor: subtotal, valorTexto: subtotal.toFixed(2) };
+          }
+          return forma;
+        });
       }
       return prev;
     });
@@ -59,7 +61,7 @@ const FinalizarVendaModal: React.FC<FinalizarVendaModalProps> = ({
     setFormasPagamento(prev => {
       const updated = prev.map(forma => 
         forma.id === id 
-          ? { ...forma, selecionada: checked, valor: checked ? 0 : 0, valorTexto: checked ? '0.00' : '0.00' }
+          ? { ...forma, selecionada: checked, valor: 0, valorTexto: '0.00', editando: false }
           : forma
       );
       
@@ -78,21 +80,44 @@ const FinalizarVendaModal: React.FC<FinalizarVendaModalProps> = ({
   };
 
   const handleValorChange = (id: string, textoValor: string) => {
-    // Permite qualquer texto durante a edição, incluindo strings vazias
+    // Permite edição livre do texto, marca como editando
     setFormasPagamento(prev => prev.map(forma => 
-      forma.id === id ? { ...forma, valorTexto: textoValor } : forma
+      forma.id === id 
+        ? { ...forma, valorTexto: textoValor, editando: true }
+        : forma
+    ));
+  };
+
+  const handleValorFocus = (id: string) => {
+    // Marca como editando quando foca no campo
+    setFormasPagamento(prev => prev.map(forma => 
+      forma.id === id 
+        ? { ...forma, editando: true }
+        : forma
     ));
   };
 
   const handleValorBlur = (id: string) => {
-    // Aplica formatação e conversão apenas quando sai do campo
+    // Converte o texto para número e formata quando sai do campo
     setFormasPagamento(prev => prev.map(forma => {
       if (forma.id === id) {
-        const valorNumerico = parseFloat(forma.valorTexto.replace(',', '.')) || 0;
+        // Se o campo estiver vazio, usa 0
+        const textoLimpo = forma.valorTexto.trim();
+        let valorNumerico = 0;
+        
+        if (textoLimpo !== '') {
+          // Substitui vírgula por ponto e tenta converter
+          const valorConvertido = parseFloat(textoLimpo.replace(',', '.'));
+          if (!isNaN(valorConvertido) && valorConvertido >= 0) {
+            valorNumerico = valorConvertido;
+          }
+        }
+        
         return {
           ...forma,
           valor: valorNumerico,
-          valorTexto: valorNumerico.toFixed(2)
+          valorTexto: valorNumerico.toFixed(2),
+          editando: false
         };
       }
       return forma;
@@ -157,10 +182,13 @@ const FinalizarVendaModal: React.FC<FinalizarVendaModalProps> = ({
                     type="text"
                     value={forma.selecionada ? forma.valorTexto : '0.00'}
                     onChange={(e) => handleValorChange(forma.id, e.target.value)}
+                    onFocus={(e) => {
+                      handleValorFocus(forma.id);
+                      e.target.select();
+                    }}
                     onBlur={() => handleValorBlur(forma.id)}
                     disabled={!forma.selecionada}
                     className="w-24 text-right"
-                    onFocus={(e) => e.target.select()}
                   />
                 </div>
               ))}
