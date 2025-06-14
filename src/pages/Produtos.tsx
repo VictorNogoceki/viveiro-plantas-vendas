@@ -55,7 +55,7 @@ const Produtos = () => {
       categoria: "Flores",
       estoque: 5,
       preco: 85.00,
-      imagem: "https://images.unsplash.com/photo-1604537529428-15bcbeecfe4d?w=64&h=64&fit=crop&crop=center"
+      imagem: "/lovable-uploads/56fd79a4-cedc-4c8d-a9fe-624dffa1d655.png"
     }
   ]);
 
