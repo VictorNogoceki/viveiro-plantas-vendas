@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -28,23 +28,52 @@ const FinalizarVendaModal: React.FC<FinalizarVendaModalProps> = ({
 }) => {
   const [formasPagamento, setFormasPagamento] = useState<FormaPagamento[]>([
     { id: 'dinheiro', nome: 'Dinheiro', selecionada: true, valor: subtotal },
-    { id: 'cartao-credito', nome: 'Cartão de Crédito', selecionada: true, valor: subtotal },
+    { id: 'cartao-credito', nome: 'Cartão de Crédito', selecionada: false, valor: 0 },
     { id: 'cartao-debito', nome: 'Cartão de Débito', selecionada: false, valor: 0 },
     { id: 'pix', nome: 'PIX', selecionada: false, valor: 0 }
   ]);
+
+  // Recalcula os valores quando o subtotal muda
+  useEffect(() => {
+    setFormasPagamento(prev => {
+      const selecionadas = prev.filter(forma => forma.selecionada);
+      if (selecionadas.length === 1) {
+        return prev.map(forma => 
+          forma.selecionada 
+            ? { ...forma, valor: subtotal }
+            : forma
+        );
+      }
+      return prev;
+    });
+  }, [subtotal]);
 
   const totalInformado = formasPagamento.reduce((acc, forma) => 
     forma.selecionada ? acc + forma.valor : acc, 0
   );
 
-  const troco = totalInformado - subtotal;
+  const faltam = subtotal - totalInformado;
 
   const handleCheckboxChange = (id: string, checked: boolean) => {
-    setFormasPagamento(prev => prev.map(forma => 
-      forma.id === id 
-        ? { ...forma, selecionada: checked, valor: checked ? subtotal : 0 }
-        : forma
-    ));
+    setFormasPagamento(prev => {
+      const updated = prev.map(forma => 
+        forma.id === id 
+          ? { ...forma, selecionada: checked, valor: checked ? 0 : 0 }
+          : forma
+      );
+      
+      // Se apenas uma opção está selecionada, coloca o valor total nela
+      const selecionadas = updated.filter(forma => forma.selecionada);
+      if (selecionadas.length === 1) {
+        return updated.map(forma => 
+          forma.selecionada 
+            ? { ...forma, valor: subtotal }
+            : forma
+        );
+      }
+      
+      return updated;
+    });
   };
 
   const handleValorChange = (id: string, valor: string) => {
@@ -85,8 +114,8 @@ const FinalizarVendaModal: React.FC<FinalizarVendaModalProps> = ({
               <span>R$ {totalInformado.toFixed(2)}</span>
             </div>
             <div className="flex justify-between">
-              <span>Troco:</span>
-              <span>R$ {troco.toFixed(2)}</span>
+              <span>Faltam:</span>
+              <span>R$ {faltam.toFixed(2)}</span>
             </div>
           </div>
 
@@ -112,7 +141,7 @@ const FinalizarVendaModal: React.FC<FinalizarVendaModalProps> = ({
                     type="number"
                     step="0.01"
                     min="0"
-                    value={forma.valor.toFixed(2)}
+                    value={forma.selecionada ? forma.valor.toFixed(2) : '0.00'}
                     onChange={(e) => handleValorChange(forma.id, e.target.value)}
                     disabled={!forma.selecionada}
                     className="w-24 text-right"
