@@ -37,38 +37,38 @@ const Estoque = () => {
   const estoqueItems: EstoqueItem[] = [
     {
       id: 1,
-      codigo: "50",
-      nome: "AÇÚCAR",
-      categoria: "Geral",
-      estoque: 40,
+      codigo: "PLT001",
+      nome: "ROSA VERMELHA",
+      categoria: "Flores",
+      estoque: 25,
       unidade: "UN",
       status: "normal"
     },
     {
       id: 2,
-      codigo: "10",
-      nome: "ARROZ 5KG TIO JOÃO",
-      categoria: "Geral",
-      estoque: 7,
+      codigo: "PLT002",
+      nome: "SAMAMBAIA",
+      categoria: "Folhagem",
+      estoque: 8,
       unidade: "UN",
       status: "baixo"
     },
     {
       id: 3,
-      codigo: "1002",
-      nome: "CAFÉ PILÃO",
-      categoria: "Geral",
-      estoque: 94,
+      codigo: "PLT003",
+      nome: "SUCULENTA ECHEVERIA",
+      categoria: "Suculentas",
+      estoque: 45,
       unidade: "UN",
       status: "normal"
     },
     {
       id: 4,
-      codigo: "142",
-      nome: "ÓLEO DE SOJA LIZA PET 900ML",
-      categoria: "ÓLEO",
-      estoque: 1,
-      unidade: "L",
+      codigo: "PLT004",
+      nome: "ORQUÍDEA PHALAENOPSIS",
+      categoria: "Flores",
+      estoque: 5,
+      unidade: "UN",
       status: "baixo"
     }
   ];
@@ -78,8 +78,8 @@ const Estoque = () => {
       id: 1,
       data: "2024-06-14 10:30",
       tipo: "entrada",
-      produto: "AÇÚCAR",
-      quantidade: 50,
+      produto: "ROSA VERMELHA",
+      quantidade: 25,
       usuario: "Admin",
       observacao: "Compra fornecedor"
     },
@@ -87,8 +87,8 @@ const Estoque = () => {
       id: 2,
       data: "2024-06-14 09:15",
       tipo: "saida",
-      produto: "ARROZ 5KG TIO JOÃO",
-      quantidade: 3,
+      produto: "SAMAMBAIA",
+      quantidade: 2,
       usuario: "Admin",
       observacao: "Venda"
     }
@@ -101,7 +101,7 @@ const Estoque = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Breadcrumb */}
         <Breadcrumb className="mb-6">
@@ -120,18 +120,19 @@ const Estoque = () => {
           </BreadcrumbList>
         </Breadcrumb>
 
-        {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Gerenciamento de Estoque</h1>
-        </div>
-
         {/* Tabs */}
         <Tabs defaultValue="produtos" className="w-full">
-          <TabsList className="grid w-fit grid-cols-2 mb-6">
-            <TabsTrigger value="produtos" className="data-[state=active]:bg-orange-500 data-[state=active]:text-white">
+          <TabsList className="grid w-fit grid-cols-2 mb-6 bg-white border-b">
+            <TabsTrigger 
+              value="produtos" 
+              className="data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:border-b-2 data-[state=active]:border-blue-600 rounded-none bg-transparent text-gray-600"
+            >
               Produtos em Estoque
             </TabsTrigger>
-            <TabsTrigger value="historico" className="data-[state=active]:bg-orange-500 data-[state=active]:text-white">
+            <TabsTrigger 
+              value="historico" 
+              className="data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:border-b-2 data-[state=active]:border-blue-600 rounded-none bg-transparent text-gray-600"
+            >
               Histórico de Movimentações
             </TabsTrigger>
           </TabsList>
@@ -139,7 +140,7 @@ const Estoque = () => {
           <TabsContent value="produtos">
             {/* Actions */}
             <div className="flex items-center justify-between mb-6">
-              <Button className="bg-orange-500 hover:bg-orange-600 text-white gap-2">
+              <Button className="bg-orange-500 hover:bg-orange-600 text-white gap-2 rounded-md">
                 <Plus className="h-4 w-4" />
                 Nova Movimentação
               </Button>
@@ -150,92 +151,86 @@ const Estoque = () => {
                   placeholder="Buscar por nome, código ou categoria"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
+                  className="pl-10 border-gray-300"
                 />
               </div>
             </div>
 
             {/* Products Table */}
-            <Card>
-              <CardContent className="p-0">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="bg-gray-50">
-                      <TableHead>Código</TableHead>
-                      <TableHead>Nome</TableHead>
-                      <TableHead>Categoria</TableHead>
-                      <TableHead>Estoque</TableHead>
-                      <TableHead className="text-right">Ações</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredEstoque.map((item) => (
-                      <TableRow key={item.id} className="hover:bg-gray-50">
-                        <TableCell className="font-mono text-sm">{item.codigo}</TableCell>
-                        <TableCell className="font-medium">{item.nome}</TableCell>
-                        <TableCell>
-                          <span className={item.categoria === "ÓLEO" ? "text-orange-600" : "text-gray-900"}>
-                            {item.categoria}
+            <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-gray-50 border-b border-gray-200">
+                    <TableHead className="text-gray-700 font-medium">Código</TableHead>
+                    <TableHead className="text-gray-700 font-medium">Nome</TableHead>
+                    <TableHead className="text-gray-700 font-medium">Categoria</TableHead>
+                    <TableHead className="text-gray-700 font-medium">Estoque</TableHead>
+                    <TableHead className="text-right text-gray-700 font-medium">Ações</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredEstoque.map((item) => (
+                    <TableRow key={item.id} className="hover:bg-gray-50 border-b border-gray-100">
+                      <TableCell className="font-mono text-sm text-gray-900">{item.codigo}</TableCell>
+                      <TableCell className="font-medium text-gray-900">{item.nome}</TableCell>
+                      <TableCell className="text-gray-700">{item.categoria}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <span className={item.status === "baixo" ? "text-orange-600 font-semibold" : "text-gray-900"}>
+                            {item.estoque} {item.unidade}
                           </span>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <span className={item.status === "baixo" ? "text-orange-600 font-semibold" : "text-gray-900"}>
-                              {item.estoque} {item.unidade}
-                            </span>
-                            {item.status === "baixo" && (
-                              <Badge variant="secondary" className="bg-orange-100 text-orange-600 text-xs">
-                                Baixo
-                              </Badge>
-                            )}
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex gap-2 justify-end">
-                            <Button 
-                              size="sm" 
-                              className="bg-orange-500 hover:bg-orange-600 text-white gap-1 text-xs px-3 py-1 h-8"
-                            >
-                              <Plus className="h-3 w-3" />
-                              Movimentar
-                            </Button>
-                            <Button 
-                              size="sm" 
-                              variant="outline"
-                              className="gap-1 text-xs px-3 py-1 h-8"
-                            >
-                              <History className="h-3 w-3" />
-                              Histórico
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                          {item.status === "baixo" && (
+                            <Badge className="bg-orange-100 text-orange-600 text-xs border-orange-200">
+                              Baixo
+                            </Badge>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex gap-2 justify-end">
+                          <Button 
+                            size="sm" 
+                            className="bg-orange-500 hover:bg-orange-600 text-white gap-1 text-xs px-3 py-1 h-8"
+                          >
+                            <Plus className="h-3 w-3" />
+                            Movimentar
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            className="gap-1 text-xs px-3 py-1 h-8 border-gray-300 text-gray-600 hover:bg-gray-50"
+                          >
+                            <History className="h-3 w-3" />
+                            Histórico
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
 
-                {filteredEstoque.length === 0 && (
-                  <div className="text-center py-8 text-gray-500">
-                    <Package className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>Nenhum produto encontrado</p>
-                    <p className="text-sm">Tente ajustar os filtros de busca</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+              {filteredEstoque.length === 0 && (
+                <div className="text-center py-8 text-gray-500">
+                  <Package className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <p>Nenhum produto encontrado</p>
+                  <p className="text-sm">Tente ajustar os filtros de busca</p>
+                </div>
+              )}
+            </div>
 
             {/* Pagination */}
             <div className="mt-6 flex justify-center">
               <Pagination>
                 <PaginationContent>
                   <PaginationItem>
-                    <PaginationPrevious href="#" />
+                    <PaginationPrevious href="#" className="text-orange-600" />
                   </PaginationItem>
                   <PaginationItem>
-                    <PaginationLink href="#" isActive>1</PaginationLink>
+                    <PaginationLink href="#" isActive className="bg-orange-600 text-white border-orange-600">1</PaginationLink>
                   </PaginationItem>
                   <PaginationItem>
-                    <PaginationNext href="#" />
+                    <PaginationNext href="#" className="text-orange-600" />
                   </PaginationItem>
                 </PaginationContent>
               </Pagination>
@@ -243,41 +238,38 @@ const Estoque = () => {
           </TabsContent>
 
           <TabsContent value="historico">
-            <Card>
-              <CardContent className="p-0">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="bg-gray-50">
-                      <TableHead>Data/Hora</TableHead>
-                      <TableHead>Tipo</TableHead>
-                      <TableHead>Produto</TableHead>
-                      <TableHead>Quantidade</TableHead>
-                      <TableHead>Usuário</TableHead>
-                      <TableHead>Observação</TableHead>
+            <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-gray-50 border-b border-gray-200">
+                    <TableHead className="text-gray-700 font-medium">Data/Hora</TableHead>
+                    <TableHead className="text-gray-700 font-medium">Tipo</TableHead>
+                    <TableHead className="text-gray-700 font-medium">Produto</TableHead>
+                    <TableHead className="text-gray-700 font-medium">Quantidade</TableHead>
+                    <TableHead className="text-gray-700 font-medium">Usuário</TableHead>
+                    <TableHead className="text-gray-700 font-medium">Observação</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {movimentacoes.map((mov) => (
+                    <TableRow key={mov.id} className="hover:bg-gray-50 border-b border-gray-100">
+                      <TableCell className="font-mono text-sm text-gray-900">{mov.data}</TableCell>
+                      <TableCell>
+                        <Badge 
+                          className={mov.tipo === "entrada" ? "bg-green-100 text-green-700 border-green-200" : "bg-red-100 text-red-700 border-red-200"}
+                        >
+                          {mov.tipo === "entrada" ? "Entrada" : "Saída"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="font-medium text-gray-900">{mov.produto}</TableCell>
+                      <TableCell className="text-gray-900">{mov.quantidade}</TableCell>
+                      <TableCell className="text-gray-900">{mov.usuario}</TableCell>
+                      <TableCell className="text-gray-600">{mov.observacao}</TableCell>
                     </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {movimentacoes.map((mov) => (
-                      <TableRow key={mov.id} className="hover:bg-gray-50">
-                        <TableCell className="font-mono text-sm">{mov.data}</TableCell>
-                        <TableCell>
-                          <Badge 
-                            variant={mov.tipo === "entrada" ? "default" : "secondary"}
-                            className={mov.tipo === "entrada" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}
-                          >
-                            {mov.tipo === "entrada" ? "Entrada" : "Saída"}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="font-medium">{mov.produto}</TableCell>
-                        <TableCell>{mov.quantidade}</TableCell>
-                        <TableCell>{mov.usuario}</TableCell>
-                        <TableCell className="text-gray-600">{mov.observacao}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           </TabsContent>
         </Tabs>
       </div>
