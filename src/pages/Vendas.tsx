@@ -12,7 +12,10 @@ interface Produto {
   id: number;
   codigo: string;
   nome: string;
+  categoria: string;
+  estoque: number;
   preco: number;
+  imagem: string;
 }
 
 interface ItemCarrinho {
@@ -23,10 +26,42 @@ interface ItemCarrinho {
 
 const Vendas = () => {
   const [produtos] = useState<Produto[]>([
-    { id: 1, codigo: "50", nome: "AÇUCAR", preco: 25.90 },
-    { id: 2, codigo: "10", nome: "ARROZ 5KG TIO JOÃO", preco: 39.90 },
-    { id: 3, codigo: "1002", nome: "CAFÉ PILÃO", preco: 29.00 },
-    { id: 4, codigo: "142", nome: "ÓLEO DE SOJA LIZA PET 900ML", preco: 8.90 }
+    {
+      id: 1,
+      codigo: "PLT001",
+      nome: "ROSA VERMELHA",
+      categoria: "Flores",
+      estoque: 25,
+      preco: 15.90,
+      imagem: "/lovable-uploads/f3ca6925-b6cb-459b-9eaa-422549153b2b.png"
+    },
+    {
+      id: 2,
+      codigo: "PLT002", 
+      nome: "SAMAMBAIA",
+      categoria: "Folhagem",
+      estoque: 8,
+      preco: 25.00,
+      imagem: "/lovable-uploads/4b16ca18-e502-4020-96ef-096f7dbea63d.png"
+    },
+    {
+      id: 3,
+      codigo: "PLT003",
+      nome: "SUCULENTA ECHEVERIA",
+      categoria: "Suculentas",
+      estoque: 45,
+      preco: 12.50,
+      imagem: "/lovable-uploads/76b52c52-e6fb-4664-beb4-5dfa62c8869d.png"
+    },
+    {
+      id: 4,
+      codigo: "PLT004",
+      nome: "ORQUÍDEA PHALAENOPSIS",
+      categoria: "Flores",
+      estoque: 5,
+      preco: 85.00,
+      imagem: "/lovable-uploads/56fd79a4-cedc-4c8d-a9fe-624dffa1d655.png"
+    }
   ]);
 
   const [carrinho, setCarrinho] = useState<ItemCarrinho[]>([]);
@@ -266,18 +301,38 @@ const Vendas = () => {
                   <div className="space-y-2 max-h-96 overflow-y-auto">
                     {produtosFiltrados.map((produto) => (
                       <div key={produto.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-4">
-                            <span className="font-mono text-sm text-gray-600">{produto.codigo}</span>
-                            <span className="font-medium">{produto.nome}</span>
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-md overflow-hidden bg-gray-100 flex-shrink-0">
+                            <img 
+                              src={produto.imagem} 
+                              alt={produto.nome}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2">
+                              <span className="font-mono text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded">
+                                {produto.codigo}
+                              </span>
+                              <span className="text-xs text-gray-500">
+                                {produto.categoria}
+                              </span>
+                            </div>
+                            <div className="font-medium text-sm">{produto.nome}</div>
+                            <div className="text-xs text-gray-500">
+                              Estoque: <span className={produto.estoque <= 10 ? "text-red-600 font-semibold" : "text-gray-700"}>{produto.estoque}</span>
+                            </div>
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="font-bold">R$ {produto.preco.toFixed(2)}</span>
+                          <div className="text-right">
+                            <div className="font-bold text-lg">R$ {produto.preco.toFixed(2)}</div>
+                          </div>
                           <Button
                             size="sm"
                             onClick={() => adicionarAoCarrinho(produto)}
                             className="bg-orange-500 hover:bg-orange-600 text-white"
+                            disabled={produto.estoque === 0}
                           >
                             <Plus className="h-4 w-4" />
                           </Button>
