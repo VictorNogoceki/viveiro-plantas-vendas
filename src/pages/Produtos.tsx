@@ -46,7 +46,7 @@ const Produtos = () => {
       categoria: "Suculentas",
       estoque: 45,
       preco: 12.50,
-      imagem: "https://images.unsplash.com/photo-1459411621453-7b03977f4bfc?w=64&h=64&fit=crop&crop=center"
+      imagem: "/lovable-uploads/76b52c52-e6fb-4664-beb4-5dfa62c8869d.png"
     },
     {
       id: 4,
