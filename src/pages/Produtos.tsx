@@ -9,6 +9,7 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbP
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
+import EditProductDialog from "@/components/EditProductDialog";
 
 interface Produto {
   id: number;
@@ -21,7 +22,7 @@ interface Produto {
 }
 
 const Produtos = () => {
-  const [produtos] = useState<Produto[]>([
+  const [produtos, setProdutos] = useState<Produto[]>([
     {
       id: 1,
       codigo: "PLT001",
@@ -61,6 +62,8 @@ const Produtos = () => {
   ]);
 
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedProduct, setSelectedProduct] = useState<Produto | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const { toast } = useToast();
 
   const filteredProdutos = produtos.filter(produto =>
@@ -70,10 +73,16 @@ const Produtos = () => {
   );
 
   const handleEdit = (produto: Produto) => {
-    toast({
-      title: "Editar Produto",
-      description: `Editando ${produto.nome}`,
-    });
+    setSelectedProduct(produto);
+    setIsEditDialogOpen(true);
+  };
+
+  const handleSaveProduct = (updatedProduct: Produto) => {
+    setProdutos(prev => 
+      prev.map(produto => 
+        produto.id === updatedProduct.id ? updatedProduct : produto
+      )
+    );
   };
 
   const handleDelete = (produto: Produto) => {
@@ -219,6 +228,14 @@ const Produtos = () => {
             </PaginationContent>
           </Pagination>
         </div>
+
+        {/* Edit Product Dialog */}
+        <EditProductDialog
+          produto={selectedProduct}
+          open={isEditDialogOpen}
+          onOpenChange={setIsEditDialogOpen}
+          onSave={handleSaveProduct}
+        />
       </div>
     </div>
   );
