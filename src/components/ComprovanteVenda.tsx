@@ -64,10 +64,9 @@ const ComprovanteVenda: React.FC<ComprovanteVendaProps> = ({
         <div className="space-y-4 text-sm">
           {/* Cabeçalho da empresa */}
           <div className="text-center space-y-1">
-            <h3 className="font-bold text-lg">SuperMercado Express</h3>
-            <p>Av. Comercial, 1000, Centro</p>
-            <p>CNPJ: 12.345.678/0001-99</p>
-            <p>Tel: (11) 3333-4444</p>
+            <h3 className="font-bold text-lg">VIVEIRO EBENEZER</h3>
+            <p>Av: Perimetral Presidente Tancredo de Almeida Neves, 100</p>
+            <p>TEL: (44) 99926-0736</p>
           </div>
 
           <hr className="border-gray-300" />
