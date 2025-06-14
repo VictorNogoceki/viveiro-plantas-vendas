@@ -1,10 +1,10 @@
-
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import CarrinhoCompras from "@/components/CarrinhoCompras";
 import SelecaoProdutos from "@/components/SelecaoProdutos";
 import HeaderVendas from "@/components/HeaderVendas";
 import FinalizarVendaModal from "@/components/FinalizarVendaModal";
+import ComprovanteVenda from "@/components/ComprovanteVenda";
 
 interface Produto {
   id: number;
@@ -68,6 +68,13 @@ const Vendas = () => {
   const [produtoSelecionado, setProdutoSelecionado] = useState<Produto | null>(produtos[0]);
   const { toast } = useToast();
   const [isFinalizarModalOpen, setIsFinalizarModalOpen] = useState(false);
+  const [isComprovanteOpen, setIsComprovanteOpen] = useState(false);
+  const [ultimaVenda, setUltimaVenda] = useState<{
+    carrinho: ItemCarrinho[];
+    subtotal: number;
+    formasPagamento: { nome: string; valor: number }[];
+    vendaId: string;
+  } | null>(null);
 
   const adicionarAoCarrinho = (produto: Produto) => {
     const itemExistente = carrinho.find(item => item.produto.id === produto.id);
@@ -126,7 +133,17 @@ const Vendas = () => {
     setIsFinalizarModalOpen(true);
   };
 
-  const confirmarFinalizacao = () => {
+  const confirmarFinalizacao = (formasPagamento: { nome: string; valor: number }[]) => {
+    const vendaId = `${Date.now().toString().slice(-6)}`;
+    
+    // Salva os dados da venda para o comprovante
+    setUltimaVenda({
+      carrinho: [...carrinho],
+      subtotal,
+      formasPagamento,
+      vendaId
+    });
+
     toast({
       title: "Venda Finalizada",
       description: `Venda realizada com sucesso! Total: R$ ${subtotal.toFixed(2)}`,
@@ -134,6 +151,8 @@ const Vendas = () => {
     
     setCarrinho([]);
     setClienteSearch("");
+    setIsFinalizarModalOpen(false);
+    setIsComprovanteOpen(true);
   };
 
   const subtotal = carrinho.reduce((acc, item) => acc + item.total, 0);
@@ -175,6 +194,17 @@ const Vendas = () => {
         onConfirm={confirmarFinalizacao}
         subtotal={subtotal}
       />
+
+      {ultimaVenda && (
+        <ComprovanteVenda
+          isOpen={isComprovanteOpen}
+          onClose={() => setIsComprovanteOpen(false)}
+          carrinho={ultimaVenda.carrinho}
+          subtotal={ultimaVenda.subtotal}
+          formasPagamento={ultimaVenda.formasPagamento}
+          vendaId={ultimaVenda.vendaId}
+        />
+      )}
     </div>
   );
 };

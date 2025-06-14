@@ -18,7 +18,7 @@ interface FormaPagamento {
 interface FinalizarVendaModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: () => void;
+  onConfirm: (formasPagamento: { nome: string; valor: number }[]) => void;
   subtotal: number;
 }
 
@@ -125,7 +125,11 @@ const FinalizarVendaModal: React.FC<FinalizarVendaModalProps> = ({
   };
 
   const handleFinalizar = () => {
-    onConfirm();
+    const formasSelecionadas = formasPagamento
+      .filter(forma => forma.selecionada && forma.valor > 0)
+      .map(forma => ({ nome: forma.nome, valor: forma.valor }));
+    
+    onConfirm(formasSelecionadas);
     onClose();
   };
 
