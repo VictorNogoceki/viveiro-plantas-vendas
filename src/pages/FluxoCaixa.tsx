@@ -1,10 +1,10 @@
-
 import { useState } from "react";
 import { Plus, RefreshCw, ChevronDown, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import NovoRegistroCaixaModal from "@/components/NovoRegistroCaixaModal";
 
 const FluxoCaixa = () => {
   const [registros, setRegistros] = useState([
@@ -58,6 +58,8 @@ const FluxoCaixa = () => {
     }
   ]);
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const entradas = registros
     .filter(r => r.tipo === "Entrada")
     .reduce((sum, r) => sum + r.valor, 0);
@@ -70,6 +72,10 @@ const FluxoCaixa = () => {
 
   const removeRegistro = (id: number) => {
     setRegistros(registros.filter(r => r.id !== id));
+  };
+
+  const handleNovoRegistro = (novoRegistro: any) => {
+    setRegistros([novoRegistro, ...registros]);
   };
 
   return (
@@ -126,7 +132,10 @@ const FluxoCaixa = () => {
       {/* Controles */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div className="flex gap-3">
-          <Button className="bg-orange-500 hover:bg-orange-600 text-white">
+          <Button 
+            className="bg-orange-500 hover:bg-orange-600 text-white"
+            onClick={() => setIsModalOpen(true)}
+          >
             <Plus className="h-4 w-4 mr-2" />
             Novo Registro
           </Button>
@@ -249,6 +258,12 @@ const FluxoCaixa = () => {
           </Button>
         </div>
       </div>
+
+      <NovoRegistroCaixaModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={handleNovoRegistro}
+      />
     </div>
   );
 };
