@@ -1,13 +1,14 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowDown, Users, UserPlus, Leaf } from "lucide-react";
+import { ArrowDown, Users, UserPlus, Leaf, Edit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
+import EditClientModal from "@/components/EditClientModal";
 
 interface Cliente {
   id: number;
@@ -33,6 +34,8 @@ const Clientes = () => {
   ]);
   
   const [showForm, setShowForm] = useState(false);
+  const [editingClient, setEditingClient] = useState<Cliente | null>(null);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [formData, setFormData] = useState({
     nome: '',
     cpfCnpj: '',
@@ -75,6 +78,25 @@ const Clientes = () => {
     toast({
       title: "Sucesso",
       description: "Cliente cadastrado com sucesso!",
+    });
+  };
+
+  const handleEdit = (cliente: Cliente) => {
+    setEditingClient(cliente);
+    setShowEditModal(true);
+  };
+
+  const handleSaveEdit = (updatedClient: Cliente) => {
+    setClientes(clientes.map(c => c.id === updatedClient.id ? updatedClient : c));
+  };
+
+  const handleDelete = (clienteId: number) => {
+    const clienteToDelete = clientes.find(c => c.id === clienteId);
+    setClientes(clientes.filter(c => c.id !== clienteId));
+    
+    toast({
+      title: "Cliente Excluído",
+      description: `${clienteToDelete?.nome} foi excluído com sucesso!`,
     });
   };
 
@@ -181,6 +203,7 @@ const Clientes = () => {
                   <TableHead>Telefone</TableHead>
                   <TableHead>E-mail</TableHead>
                   <TableHead>Endereço</TableHead>
+                  <TableHead className="w-[120px]">Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -191,12 +214,59 @@ const Clientes = () => {
                     <TableCell>{cliente.telefone}</TableCell>
                     <TableCell>{cliente.email}</TableCell>
                     <TableCell>{cliente.endereco}</TableCell>
+                    <TableCell>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => handleEdit(cliente)}
+                          className="h-8 w-8"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              className="h-8 w-8 text-red-600 hover:text-red-700"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Tem certeza que deseja excluir o cliente "{cliente.nome}"? Esta ação não pode ser desfeita.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => handleDelete(cliente.id)}
+                                className="bg-red-600 hover:bg-red-700"
+                              >
+                                Excluir
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
           </CardContent>
         </Card>
+
+        <EditClientModal
+          cliente={editingClient}
+          open={showEditModal}
+          onOpenChange={setShowEditModal}
+          onSave={handleSaveEdit}
+        />
       </main>
     </div>
   );
