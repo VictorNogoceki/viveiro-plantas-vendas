@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Package, Plus, Search, Edit, Trash2, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -29,7 +28,7 @@ const Produtos = () => {
       categoria: "Flores",
       estoque: 25,
       preco: 15.90,
-      imagem: "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=64&h=64&fit=crop&crop=center"
+      imagem: "/lovable-uploads/f3ca6925-b6cb-459b-9eaa-422549153b2b.png"
     },
     {
       id: 2,
