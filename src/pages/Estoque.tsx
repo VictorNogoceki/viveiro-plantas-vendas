@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Package, Plus, Search, RotateCcw, History } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -10,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { Link } from "react-router-dom";
+import MovimentacaoEstoqueModal from "@/components/MovimentacaoEstoqueModal";
 
 interface EstoqueItem {
   id: number;
@@ -33,6 +33,8 @@ interface MovimentacaoItem {
 
 const Estoque = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [produtoSelecionado, setProdutoSelecionado] = useState<EstoqueItem | undefined>();
 
   const estoqueItems: EstoqueItem[] = [
     {
@@ -100,6 +102,16 @@ const Estoque = () => {
     item.categoria.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const handleNovaMovimentacao = (produto?: EstoqueItem) => {
+    setProdutoSelecionado(produto);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setProdutoSelecionado(undefined);
+  };
+
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -140,7 +152,10 @@ const Estoque = () => {
           <TabsContent value="produtos">
             {/* Actions */}
             <div className="flex items-center justify-between mb-6">
-              <Button className="bg-orange-500 hover:bg-orange-600 text-white gap-2 rounded-md">
+              <Button 
+                onClick={() => handleNovaMovimentacao()}
+                className="bg-orange-500 hover:bg-orange-600 text-white gap-2 rounded-md"
+              >
                 <Plus className="h-4 w-4" />
                 Nova Movimentação
               </Button>
@@ -190,6 +205,7 @@ const Estoque = () => {
                         <div className="flex gap-2 justify-end">
                           <Button 
                             size="sm" 
+                            onClick={() => handleNovaMovimentacao(item)}
                             className="bg-orange-500 hover:bg-orange-600 text-white gap-1 text-xs px-3 py-1 h-8"
                           >
                             <Plus className="h-3 w-3" />
@@ -272,6 +288,14 @@ const Estoque = () => {
             </div>
           </TabsContent>
         </Tabs>
+
+        {/* Modal de Movimentação */}
+        <MovimentacaoEstoqueModal
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          produto={produtoSelecionado}
+          produtos={estoqueItems}
+        />
       </div>
     </div>
   );
