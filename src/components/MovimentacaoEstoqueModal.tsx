@@ -26,8 +26,8 @@ interface MovimentacaoEstoqueModalProps {
 
 const MovimentacaoEstoqueModal = ({ isOpen, onClose, produto, produtos }: MovimentacaoEstoqueModalProps) => {
   const [produtoSelecionado, setProdutoSelecionado] = useState(produto?.id.toString() || "");
-  const [tipoMovimentacao, setTipoMovimentacao] = useState("entrada");
-  const [quantidade, setQuantidade] = useState("1");
+  const [tipoMovimentacao, setTipoMovimentacao] = useState("");
+  const [quantidade, setQuantidade] = useState("");
   const [descricao, setDescricao] = useState("");
 
   const produtoAtual = produtos.find(p => p.id.toString() === produtoSelecionado);
@@ -42,8 +42,8 @@ const MovimentacaoEstoqueModal = ({ isOpen, onClose, produto, produtos }: Movime
     
     // Reset form
     setProdutoSelecionado("");
-    setTipoMovimentacao("entrada");
-    setQuantidade("1");
+    setTipoMovimentacao("");
+    setQuantidade("");
     setDescricao("");
     onClose();
   };
@@ -70,7 +70,7 @@ const MovimentacaoEstoqueModal = ({ isOpen, onClose, produto, produtos }: Movime
               <SelectContent>
                 {produtos.map((prod) => (
                   <SelectItem key={prod.id} value={prod.id.toString()}>
-                    {prod.codigo} - {prod.nome} (Estoque atual: {prod.estoque} {prod.unidade})
+                    {prod.codigo} - {prod.nome}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -84,31 +84,14 @@ const MovimentacaoEstoqueModal = ({ isOpen, onClose, produto, produtos }: Movime
             </Label>
             <Select value={tipoMovimentacao} onValueChange={setTipoMovimentacao}>
               <SelectTrigger className="w-full">
-                <SelectValue />
+                <SelectValue placeholder="Selecione o tipo de movimentação" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="entrada">✅ Entrada de Estoque</SelectItem>
-                <SelectItem value="saida">❌ Saída de Estoque</SelectItem>
+                <SelectItem value="entrada">Entrada de Estoque</SelectItem>
+                <SelectItem value="saida">Saída de Estoque</SelectItem>
               </SelectContent>
             </Select>
           </div>
-
-          {/* Info sobre o tipo */}
-          {tipoMovimentacao === "entrada" && (
-            <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
-              <p className="text-sm text-blue-700">
-                📈 Entrada - Aumenta o estoque do produto
-              </p>
-            </div>
-          )}
-
-          {tipoMovimentacao === "saida" && (
-            <div className="bg-red-50 border border-red-200 rounded-md p-3">
-              <p className="text-sm text-red-700">
-                📉 Saída - Diminui o estoque do produto
-              </p>
-            </div>
-          )}
 
           {/* Quantidade */}
           <div className="space-y-2">
@@ -120,6 +103,7 @@ const MovimentacaoEstoqueModal = ({ isOpen, onClose, produto, produtos }: Movime
               min="1"
               value={quantidade}
               onChange={(e) => setQuantidade(e.target.value)}
+              placeholder="Ex: 10 (quantidade)"
               className="w-full"
             />
           </div>
@@ -149,7 +133,7 @@ const MovimentacaoEstoqueModal = ({ isOpen, onClose, produto, produtos }: Movime
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={!produtoSelecionado || !quantidade || !descricao}
+            disabled={!produtoSelecionado || !tipoMovimentacao || !quantidade || !descricao}
             className="flex-1 bg-orange-500 hover:bg-orange-600 text-white"
           >
             Confirmar Movimentação
