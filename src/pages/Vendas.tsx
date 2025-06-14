@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { ShoppingCart, Plus, Search, User, Trash2 } from "lucide-react";
+import { ShoppingCart, Plus, Search, User, Trash2, Minus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -67,6 +67,7 @@ const Vendas = () => {
   const [carrinho, setCarrinho] = useState<ItemCarrinho[]>([]);
   const [clienteSearch, setClienteSearch] = useState("");
   const [produtoSearch, setProdutoSearch] = useState("");
+  const [produtoSelecionado, setProdutoSelecionado] = useState<Produto | null>(produtos[0]);
   const { toast } = useToast();
 
   const produtosFiltrados = produtos.filter(produto =>
@@ -176,6 +177,23 @@ const Vendas = () => {
                 />
               </div>
 
+              {/* Produto Selecionado */}
+              {produtoSelecionado && (
+                <div className="text-center py-8">
+                  <h3 className="text-lg font-bold mb-2">{produtoSelecionado.nome}</h3>
+                  <div className="text-2xl font-bold text-orange-500 mb-4">
+                    R$ {produtoSelecionado.preco.toFixed(2)}
+                  </div>
+                  <div className="w-48 h-48 mx-auto mb-4 border-4 border-orange-500 rounded-lg overflow-hidden bg-white">
+                    <img 
+                      src={produtoSelecionado.imagem} 
+                      alt={produtoSelecionado.nome}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                </div>
+              )}
+
               {/* Tabela do Carrinho */}
               <div className="border rounded-lg">
                 <Table>
@@ -200,13 +218,25 @@ const Vendas = () => {
                         <TableRow key={item.produto.id}>
                           <TableCell className="font-medium">{item.produto.nome}</TableCell>
                           <TableCell>
-                            <Input
-                              type="number"
-                              value={item.quantidade}
-                              onChange={(e) => atualizarQuantidade(item.produto.id, parseInt(e.target.value) || 0)}
-                              className="w-16 h-8"
-                              min="0"
-                            />
+                            <div className="flex items-center gap-1">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => atualizarQuantidade(item.produto.id, item.quantidade - 1)}
+                                className="h-6 w-6 p-0"
+                              >
+                                <Minus className="h-3 w-3" />
+                              </Button>
+                              <span className="w-8 text-center">{item.quantidade}</span>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => atualizarQuantidade(item.produto.id, item.quantidade + 1)}
+                                className="h-6 w-6 p-0"
+                              >
+                                <Plus className="h-3 w-3" />
+                              </Button>
+                            </div>
                           </TableCell>
                           <TableCell>R$ {item.produto.preco.toFixed(2)}</TableCell>
                           <TableCell>R$ {item.total.toFixed(2)}</TableCell>
@@ -227,39 +257,40 @@ const Vendas = () => {
                 </Table>
               </div>
 
-              {/* Total */}
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span>Total de Itens: {totalItens}</span>
-                  <span>Subtotal: R$ {subtotal.toFixed(2)}</span>
-                </div>
-                
-                <div className="flex gap-2">
-                  <Button 
-                    variant="outline" 
-                    className="flex-1"
-                    onClick={limparCarrinho}
-                  >
-                    Limpar Carrinho
-                  </Button>
-                  <Button 
-                    className="flex-1 bg-blue-500 hover:bg-blue-600"
-                    onClick={finalizarVenda}
-                  >
-                    Finalizar Venda
-                  </Button>
-                </div>
+              {/* Total de Itens */}
+              <div className="text-sm text-gray-600">
+                Total de Itens: {totalItens}
+              </div>
 
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-gray-900">
-                    Total
-                  </div>
-                  <div className="text-4xl font-bold text-gray-900">
-                    R$ {subtotal.toFixed(2)}
-                  </div>
-                  <div className="text-sm text-gray-500">
-                    Adicione produtos ao carrinho
-                  </div>
+              {/* Subtotal */}
+              <div className="text-right text-sm">
+                Subtotal: <span className="font-bold">R$ {subtotal.toFixed(2)}</span>
+              </div>
+
+              {/* Botões */}
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline" 
+                  className="flex-1"
+                  onClick={limparCarrinho}
+                >
+                  Limpar Carrinho
+                </Button>
+                <Button 
+                  className="flex-1 bg-orange-500 hover:bg-orange-600"
+                  onClick={finalizarVenda}
+                >
+                  Finalizar Venda
+                </Button>
+              </div>
+
+              {/* Total Final */}
+              <div className="text-center pt-4 border-t">
+                <div className="text-lg font-bold text-gray-900">
+                  Total
+                </div>
+                <div className="text-3xl font-bold text-gray-900">
+                  R$ {subtotal.toFixed(2)}
                 </div>
               </div>
             </CardContent>
@@ -298,47 +329,47 @@ const Vendas = () => {
                 </TabsList>
                 
                 <TabsContent value="lista" className="mt-4">
-                  <div className="space-y-2 max-h-96 overflow-y-auto">
-                    {produtosFiltrados.map((produto) => (
-                      <div key={produto.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-md overflow-hidden bg-gray-100 flex-shrink-0">
-                            <img 
-                              src={produto.imagem} 
-                              alt={produto.nome}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2">
-                              <span className="font-mono text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded">
-                                {produto.codigo}
-                              </span>
-                              <span className="text-xs text-gray-500">
-                                {produto.categoria}
-                              </span>
-                            </div>
-                            <div className="font-medium text-sm">{produto.nome}</div>
-                            <div className="text-xs text-gray-500">
-                              Estoque: <span className={produto.estoque <= 10 ? "text-red-600 font-semibold" : "text-gray-700"}>{produto.estoque}</span>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <div className="text-right">
-                            <div className="font-bold text-lg">R$ {produto.preco.toFixed(2)}</div>
-                          </div>
-                          <Button
-                            size="sm"
-                            onClick={() => adicionarAoCarrinho(produto)}
-                            className="bg-orange-500 hover:bg-orange-600 text-white"
-                            disabled={produto.estoque === 0}
+                  <div className="border rounded-lg">
+                    <Table>
+                      <TableHeader>
+                        <TableRow className="bg-gray-50">
+                          <TableHead>Código</TableHead>
+                          <TableHead>Produto</TableHead>
+                          <TableHead className="text-right">Preço</TableHead>
+                          <TableHead className="w-12"></TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {produtosFiltrados.map((produto) => (
+                          <TableRow 
+                            key={produto.id} 
+                            className={`hover:bg-gray-50 cursor-pointer ${
+                              produtoSelecionado?.id === produto.id ? 'bg-orange-50' : ''
+                            }`}
+                            onClick={() => setProdutoSelecionado(produto)}
                           >
-                            <Plus className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
+                            <TableCell className="font-mono text-sm">{produto.codigo}</TableCell>
+                            <TableCell className="font-medium">{produto.nome}</TableCell>
+                            <TableCell className="text-right font-bold">
+                              R$ {produto.preco.toFixed(2)}
+                            </TableCell>
+                            <TableCell>
+                              <Button
+                                size="sm"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  adicionarAoCarrinho(produto);
+                                }}
+                                className="bg-orange-500 hover:bg-orange-600 text-white w-8 h-8 p-0"
+                                disabled={produto.estoque === 0}
+                              >
+                                <Plus className="h-4 w-4" />
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
                   </div>
                 </TabsContent>
                 
