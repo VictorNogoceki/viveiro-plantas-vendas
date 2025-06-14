@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { ShoppingCart, Plus, Search, User, Trash2, Minus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
+import FinalizarVendaModal from "@/components/FinalizarVendaModal";
 
 interface Produto {
   id: number;
@@ -69,6 +69,7 @@ const Vendas = () => {
   const [produtoSearch, setProdutoSearch] = useState("");
   const [produtoSelecionado, setProdutoSelecionado] = useState<Produto | null>(produtos[0]);
   const { toast } = useToast();
+  const [isFinalizarModalOpen, setIsFinalizarModalOpen] = useState(false);
 
   const produtosFiltrados = produtos.filter(produto =>
     produto.nome.toLowerCase().includes(produtoSearch.toLowerCase()) ||
@@ -129,6 +130,10 @@ const Vendas = () => {
       return;
     }
 
+    setIsFinalizarModalOpen(true);
+  };
+
+  const confirmarFinalizacao = () => {
     toast({
       title: "Venda Finalizada",
       description: `Venda realizada com sucesso! Total: R$ ${subtotal.toFixed(2)}`,
@@ -383,6 +388,13 @@ const Vendas = () => {
           </Card>
         </div>
       </div>
+
+      <FinalizarVendaModal
+        isOpen={isFinalizarModalOpen}
+        onClose={() => setIsFinalizarModalOpen(false)}
+        onConfirm={confirmarFinalizacao}
+        subtotal={subtotal}
+      />
     </div>
   );
 };
