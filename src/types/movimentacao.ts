@@ -1,6 +1,6 @@
 
 export interface MovimentacaoItem {
-  id: number;
+  id: string;
   data: string;
   tipo: "entrada" | "saida";
   produto: string;
