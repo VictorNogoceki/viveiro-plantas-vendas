@@ -1,4 +1,5 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,15 +25,31 @@ interface MovimentacaoEstoqueModalProps {
   onClose: () => void;
   produto?: EstoqueItem;
   produtos: EstoqueItem[];
+  onSave: (movimentacao: {
+    produtoId: string;
+    tipo: string;
+    quantidade: number;
+    descricao: string;
+  }) => void;
 }
 
-const MovimentacaoEstoqueModal = ({ isOpen, onClose, produto, produtos }: MovimentacaoEstoqueModalProps) => {
-  const [produtoSelecionado, setProdutoSelecionado] = useState(produto?.id.toString() || "");
+const MovimentacaoEstoqueModal = ({ isOpen, onClose, produto, produtos, onSave }: MovimentacaoEstoqueModalProps) => {
+  const [produtoSelecionado, setProdutoSelecionado] = useState("");
   const [tipoMovimentacao, setTipoMovimentacao] = useState("");
   const [quantidade, setQuantidade] = useState("");
   const [descricao, setDescricao] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const { toast } = useToast();
+
+  useEffect(() => {
+    if (isOpen) {
+      setProdutoSelecionado(produto?.id.toString() || "");
+      setTipoMovimentacao("");
+      setQuantidade("");
+      setDescricao("");
+      setErrors({});
+    }
+  }, [isOpen, produto]);
 
   const produtoAtual = produtos.find(p => p.id.toString() === produtoSelecionado);
 
@@ -67,19 +84,13 @@ const MovimentacaoEstoqueModal = ({ isOpen, onClose, produto, produtos }: Movime
       return;
     }
 
-    console.log("Movimentação:", {
-      produto: produtoAtual,
+    onSave({
+      produtoId: produtoSelecionado,
       tipo: tipoMovimentacao,
       quantidade: parseInt(quantidade),
       descricao: sanitizeInput(descricao)
     });
-    
-    // Reset form
-    setProdutoSelecionado("");
-    setTipoMovimentacao("");
-    setQuantidade("");
-    setDescricao("");
-    setErrors({});
+
     onClose();
   };
 

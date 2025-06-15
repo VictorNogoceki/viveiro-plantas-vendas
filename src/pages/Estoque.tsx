@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Package, Plus, Search, RotateCcw, History } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -11,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { Link } from "react-router-dom";
 import MovimentacaoEstoqueModal from "@/components/MovimentacaoEstoqueModal";
+import { useToast } from "@/hooks/use-toast";
 
 interface EstoqueItem {
   id: number;
@@ -38,8 +38,9 @@ const Estoque = () => {
   const [produtoSelecionado, setProdutoSelecionado] = useState<EstoqueItem | undefined>();
   const [activeTab, setActiveTab] = useState("produtos");
   const [historyFilter, setHistoryFilter] = useState<string | null>(null);
+  const { toast } = useToast();
 
-  const estoqueItems: EstoqueItem[] = [
+  const [estoqueItems, setEstoqueItems] = useState<EstoqueItem[]>([
     {
       id: 1,
       codigo: "PLT001",
@@ -76,9 +77,9 @@ const Estoque = () => {
       unidade: "UN",
       status: "baixo"
     }
-  ];
+  ]);
 
-  const movimentacoes: MovimentacaoItem[] = [
+  const [movimentacoes, setMovimentacoes] = useState<MovimentacaoItem[]>([
     {
       id: 1,
       data: "2024-06-14 10:30",
@@ -97,7 +98,7 @@ const Estoque = () => {
       usuario: "Admin",
       observacao: "Venda"
     }
-  ];
+  ]);
 
   const filteredEstoque = estoqueItems.filter(item =>
     item.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -122,6 +123,41 @@ const Estoque = () => {
   const handleViewHistory = (produtoNome: string) => {
     setHistoryFilter(produtoNome);
     setActiveTab("historico");
+  };
+
+  const handleSaveMovimentacao = (movimentacao: { produtoId: string; tipo: string; quantidade: number; descricao: string; }) => {
+    const { produtoId, tipo, quantidade, descricao } = movimentacao;
+
+    let produtoNome = "";
+
+    setEstoqueItems(prevItems =>
+      prevItems.map(item => {
+        if (item.id.toString() === produtoId) {
+          produtoNome = item.nome;
+          const newStock = tipo === 'entrada' ? item.estoque + quantidade : item.estoque - quantidade;
+          return { ...item, estoque: newStock, status: newStock < 10 ? 'baixo' : 'normal' };
+        }
+        return item;
+      })
+    );
+
+    if (produtoNome) {
+      const novaMovimentacao: MovimentacaoItem = {
+        id: movimentacoes.length + 1,
+        data: new Date().toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' }),
+        tipo: tipo as "entrada" | "saida",
+        produto: produtoNome,
+        quantidade: quantidade,
+        usuario: "Admin", // Assuming 'Admin' for now
+        observacao: descricao
+      };
+      setMovimentacoes(prev => [novaMovimentacao, ...prev]);
+    }
+
+    toast({
+      title: "Movimentação Realizada",
+      description: "O estoque foi atualizado com sucesso."
+    });
   };
 
   return (
@@ -334,6 +370,7 @@ const Estoque = () => {
           onClose={handleCloseModal}
           produto={produtoSelecionado}
           produtos={estoqueItems}
+          onSave={handleSaveMovimentacao}
         />
       </div>
     </div>
