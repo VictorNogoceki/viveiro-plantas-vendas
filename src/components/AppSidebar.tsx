@@ -1,4 +1,3 @@
-
 import { Calendar, ClipboardList, Home, Package, Warehouse, Users, ShoppingCart, FileText, BarChart3, DollarSign } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import {
@@ -71,7 +70,7 @@ export function AppSidebar() {
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel className="text-viveiro-gray-dark text-lg font-bold mb-4">
-            Viveiro <span className="text-viveiro-yellow">EBENEZER</span>
+            Viveiro <span className="text-viveiro-green">EBENEZER</span>
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>

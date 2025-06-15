@@ -66,8 +66,7 @@ export default {
 				viveiro: {
 					gray: 'hsl(var(--viveiro-gray))',
 					'gray-dark': 'hsl(var(--viveiro-gray-dark))',
-					green: 'hsl(var(--viveiro-green))',
-					yellow: 'hsl(var(--viveiro-yellow))'
+					green: 'hsl(var(--viveiro-green))'
 				}
 			},
 			borderRadius: {

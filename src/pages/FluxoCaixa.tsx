@@ -85,7 +85,7 @@ const FluxoCaixa = () => {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Fluxo de Caixa</h1>
           <div className="text-sm text-gray-500 mt-1">
-            <span className="text-orange-500">Home</span> / Fluxo de Caixa
+            <span className="text-viveiro-green">Home</span> / Fluxo de Caixa
           </div>
         </div>
       </div>
@@ -97,7 +97,7 @@ const FluxoCaixa = () => {
             <CardTitle className="text-sm text-gray-500 font-normal">Entradas</CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
-            <div className="text-2xl font-bold text-green-600">
+            <div className="text-2xl font-bold text-viveiro-green">
               R$ {entradas.toFixed(2).replace('.', ',')}
             </div>
           </CardContent>
@@ -119,7 +119,7 @@ const FluxoCaixa = () => {
             <CardTitle className="text-sm text-gray-500 font-normal">Saldo</CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
-            <div className="text-2xl font-bold text-green-600">
+            <div className="text-2xl font-bold text-viveiro-green">
               R$ {saldo.toFixed(2).replace('.', ',')}
             </div>
           </CardContent>
@@ -130,7 +130,7 @@ const FluxoCaixa = () => {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div className="flex gap-3">
           <Button 
-            className="bg-orange-500 hover:bg-orange-600 text-white"
+            className="bg-viveiro-green hover:bg-viveiro-green/90 text-white"
             onClick={() => setIsModalOpen(true)}
           >
             <Plus className="h-4 w-4 mr-2" />
@@ -219,14 +219,14 @@ const FluxoCaixa = () => {
                       registro.formaPagamento === "Dinheiro" 
                         ? "bg-green-100 text-green-800" 
                         : registro.formaPagamento === "Crédito"
-                        ? "bg-blue-100 text-blue-800"
+                        ? "bg-gray-100 text-gray-800"
                         : "bg-gray-100 text-gray-800"
                     }`}>
                       {registro.formaPagamento}
                     </span>
                   </TableCell>
                   <TableCell className="py-4 px-6 text-right font-medium">
-                    <span className={registro.tipo === "Entrada" ? "text-green-600" : "text-red-600"}>
+                    <span className={registro.tipo === "Entrada" ? "text-viveiro-green" : "text-red-600"}>
                       {registro.tipo === "Entrada" ? "+" : "-"} R$ {registro.valor.toFixed(2).replace('.', ',')}
                     </span>
                   </TableCell>
@@ -250,7 +250,7 @@ const FluxoCaixa = () => {
       {/* Paginação */}
       <div className="flex justify-center">
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="w-8 h-8 p-0 bg-orange-500 text-white border-orange-500">
+          <Button variant="outline" size="sm" className="w-8 h-8 p-0 bg-viveiro-green text-white border-viveiro-green">
             1
           </Button>
         </div>

@@ -1,4 +1,3 @@
-
 import { Leaf, Users, Package, ShoppingCart, TrendingUp, AlertTriangle, Calendar, DollarSign } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -58,7 +57,7 @@ const Index = () => {
     },
     clientes: {
       label: "Clientes",
-      color: "#0891b2"
+      color: "#059669"
     }
   };
 
@@ -69,7 +68,7 @@ const Index = () => {
         <div className="flex items-center justify-center gap-3 mb-4">
           <Leaf className="h-8 w-8 text-viveiro-green" />
           <h1 className="text-2xl font-bold text-viveiro-gray-dark">
-            Dashboard - Viveiro <span className="text-viveiro-yellow">EBENEZER</span>
+            Dashboard - Viveiro <span className="text-viveiro-green">EBENEZER</span>
           </h1>
         </div>
         <p className="text-viveiro-gray-dark/70">
