@@ -192,11 +192,11 @@ const Estoque = () => {
                       <TableCell className="text-gray-700">{item.categoria}</TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <span className={item.status === "baixo" ? "text-primary font-semibold" : "text-gray-900"}>
+                          <span className={item.estoque < 10 ? "text-destructive font-semibold" : "text-gray-900"}>
                             {item.estoque} {item.unidade}
                           </span>
-                          {item.status === "baixo" && (
-                            <Badge variant="secondary" className="bg-primary/10 text-primary text-xs border-primary/20">
+                          {item.estoque < 10 && (
+                            <Badge variant="secondary" className="bg-destructive/10 text-destructive text-xs border-destructive/20">
                               Baixo
                             </Badge>
                           )}
