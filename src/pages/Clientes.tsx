@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { Users, UserPlus, Leaf, Edit, Trash2 } from "lucide-react";
+import { Users, UserPlus, Edit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -10,6 +9,8 @@ import EditClientModal from "@/components/EditClientModal";
 import NovoClienteModal from "@/components/NovoClienteModal";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Link } from "react-router-dom";
+import { Leaf } from "lucide-react";
 
 interface Cliente {
   id: number;
@@ -84,121 +85,110 @@ const Clientes = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Link to="/">
-                <Leaf className="h-8 w-8 text-green-600" />
-              </Link>
-              <h1 className="text-2xl font-bold text-gray-900">Cadastro de Clientes</h1>
-            </div>
-            <Button onClick={() => setShowNovoClienteModal(true)} className="gap-2">
-              <UserPlus className="h-4 w-4" />
-              Novo Cliente
-            </Button>
-          </div>
-        </div>
-      </header>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-bold text-gray-900">Cadastro de Clientes</h1>
+        <Button onClick={() => setShowNovoClienteModal(true)} className="gap-2">
+          <UserPlus className="h-4 w-4" />
+          Novo Cliente
+        </Button>
+      </div>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5" />
-              Lista de Clientes ({clientes.length})
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Nome</TableHead>
-                  <TableHead>CPF/CNPJ</TableHead>
-                  <TableHead>Telefone</TableHead>
-                  <TableHead>E-mail</TableHead>
-                  <TableHead>Endereço</TableHead>
-                  <TableHead className="w-[120px]">Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {clientes.map((cliente, index) => (
-                  <TableRow
-                    key={cliente.id}
-                    onClick={() => setSelectedClientId(selectedClientId === cliente.id ? null : cliente.id)}
-                    className="cursor-pointer animate-fade-in data-[state=selected]:bg-green-100"
-                    style={{ animationDelay: `${index * 50}ms`, animationFillMode: 'backwards' }}
-                    data-state={selectedClientId === cliente.id ? "selected" : undefined}
-                  >
-                    <TableCell className="font-medium">{cliente.nome}</TableCell>
-                    <TableCell>{cliente.cpfCnpj}</TableCell>
-                    <TableCell>{cliente.telefone}</TableCell>
-                    <TableCell>{cliente.email}</TableCell>
-                    <TableCell>{cliente.endereco}</TableCell>
-                    <TableCell>
-                      <div className="flex gap-2">
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleEdit(cliente)
-                          }}
-                          className="h-8 w-8"
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button
-                              variant="outline"
-                              size="icon"
-                              className="h-8 w-8 text-red-600 hover:text-red-700"
-                              onClick={(e) => e.stopPropagation()}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Users className="h-5 w-5" />
+            Lista de Clientes ({clientes.length})
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Nome</TableHead>
+                <TableHead>CPF/CNPJ</TableHead>
+                <TableHead>Telefone</TableHead>
+                <TableHead>E-mail</TableHead>
+                <TableHead>Endereço</TableHead>
+                <TableHead className="w-[120px]">Ações</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {clientes.map((cliente, index) => (
+                <TableRow
+                  key={cliente.id}
+                  onClick={() => setSelectedClientId(selectedClientId === cliente.id ? null : cliente.id)}
+                  className="cursor-pointer animate-fade-in data-[state=selected]:bg-green-100"
+                  style={{ animationDelay: `${index * 50}ms`, animationFillMode: 'backwards' }}
+                  data-state={selectedClientId === cliente.id ? "selected" : undefined}
+                >
+                  <TableCell className="font-medium">{cliente.nome}</TableCell>
+                  <TableCell>{cliente.cpfCnpj}</TableCell>
+                  <TableCell>{cliente.telefone}</TableCell>
+                  <TableCell>{cliente.email}</TableCell>
+                  <TableCell>{cliente.endereco}</TableCell>
+                  <TableCell>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEdit(cliente)
+                        }}
+                        className="h-8 w-8"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-8 w-8 text-red-600 hover:text-red-700"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Tem certeza que deseja excluir o cliente "{cliente.nome}"? Esta ação não pode ser desfeita.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleDelete(cliente.id)}
+                              className="bg-red-600 hover:bg-red-700"
                             >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                Tem certeza que deseja excluir o cliente "{cliente.nome}"? Esta ação não pode ser desfeita.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                              <AlertDialogAction
-                                onClick={() => handleDelete(cliente.id)}
-                                className="bg-red-600 hover:bg-red-700"
-                              >
-                                Excluir
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
+                              Excluir
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
 
-        <EditClientModal
-          cliente={editingClient}
-          open={showEditModal}
-          onOpenChange={setShowEditModal}
-          onSave={handleSaveEdit}
-        />
-        <NovoClienteModal 
-          open={showNovoClienteModal}
-          onOpenChange={setShowNovoClienteModal}
-          onClientAdded={handleAddClient}
-        />
-      </main>
+      <EditClientModal
+        cliente={editingClient}
+        open={showEditModal}
+        onOpenChange={setShowEditModal}
+        onSave={handleSaveEdit}
+      />
+      <NovoClienteModal 
+        open={showNovoClienteModal}
+        onOpenChange={setShowNovoClienteModal}
+        onClientAdded={handleAddClient}
+      />
     </div>
   );
 };
