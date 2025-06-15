@@ -9,4 +9,6 @@ export interface Produto {
   imagem: string;
   unidade: string;
   created_at: string;
+  descricao?: string;
+  ativo?: boolean;
 }

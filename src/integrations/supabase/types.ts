@@ -13,6 +13,7 @@ export type Database = {
         Row: {
           cpf_cnpj: string
           created_at: string
+          data_cadastro: string | null
           email: string | null
           endereco: string | null
           id: string
@@ -23,6 +24,7 @@ export type Database = {
         Insert: {
           cpf_cnpj: string
           created_at?: string
+          data_cadastro?: string | null
           email?: string | null
           endereco?: string | null
           id?: string
@@ -33,6 +35,7 @@ export type Database = {
         Update: {
           cpf_cnpj?: string
           created_at?: string
+          data_cadastro?: string | null
           email?: string | null
           endereco?: string | null
           id?: string
@@ -42,41 +45,227 @@ export type Database = {
         }
         Relationships: []
       }
+      fluxo_caixa: {
+        Row: {
+          data: string
+          descricao: string
+          id: string
+          origem: string | null
+          tipo: string
+          valor: number
+        }
+        Insert: {
+          data?: string
+          descricao: string
+          id?: string
+          origem?: string | null
+          tipo: string
+          valor: number
+        }
+        Update: {
+          data?: string
+          descricao?: string
+          id?: string
+          origem?: string | null
+          tipo?: string
+          valor?: number
+        }
+        Relationships: []
+      }
+      itens_venda: {
+        Row: {
+          id: string
+          preco_unitario: number
+          produto_id: string
+          quantidade: number
+          subtotal: number
+          venda_id: string
+        }
+        Insert: {
+          id?: string
+          preco_unitario: number
+          produto_id: string
+          quantidade: number
+          subtotal: number
+          venda_id: string
+        }
+        Update: {
+          id?: string
+          preco_unitario?: number
+          produto_id?: string
+          quantidade?: number
+          subtotal?: number
+          venda_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "itens_venda_produto_id_fkey"
+            columns: ["produto_id"]
+            isOneToOne: false
+            referencedRelation: "produtos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "itens_venda_venda_id_fkey"
+            columns: ["venda_id"]
+            isOneToOne: false
+            referencedRelation: "vendas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      movimentacao_estoque: {
+        Row: {
+          data: string
+          id: string
+          motivo: string | null
+          produto_id: string
+          quantidade: number
+          tipo: string
+        }
+        Insert: {
+          data?: string
+          id?: string
+          motivo?: string | null
+          produto_id: string
+          quantidade: number
+          tipo: string
+        }
+        Update: {
+          data?: string
+          id?: string
+          motivo?: string | null
+          produto_id?: string
+          quantidade?: number
+          tipo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "movimentacao_estoque_produto_id_fkey"
+            columns: ["produto_id"]
+            isOneToOne: false
+            referencedRelation: "produtos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notas_fiscais: {
+        Row: {
+          chave_acesso: string | null
+          data_emissao: string | null
+          id: string
+          numero_nf: string | null
+          serie: string | null
+          status: string | null
+          venda_id: string
+          xml_path: string | null
+        }
+        Insert: {
+          chave_acesso?: string | null
+          data_emissao?: string | null
+          id?: string
+          numero_nf?: string | null
+          serie?: string | null
+          status?: string | null
+          venda_id: string
+          xml_path?: string | null
+        }
+        Update: {
+          chave_acesso?: string | null
+          data_emissao?: string | null
+          id?: string
+          numero_nf?: string | null
+          serie?: string | null
+          status?: string | null
+          venda_id?: string
+          xml_path?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notas_fiscais_venda_id_fkey"
+            columns: ["venda_id"]
+            isOneToOne: false
+            referencedRelation: "vendas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       produtos: {
         Row: {
+          ativo: boolean | null
           categoria: string | null
-          codigo: string | null
+          codigo_produto: string | null
           created_at: string
-          estoque: number
+          descricao: string | null
           id: string
-          imagem: string | null
+          imagem_url: string | null
           nome: string
           preco: number
+          quantidade_estoque: number
           unidade: string | null
         }
         Insert: {
+          ativo?: boolean | null
           categoria?: string | null
-          codigo?: string | null
+          codigo_produto?: string | null
           created_at?: string
-          estoque?: number
+          descricao?: string | null
           id?: string
-          imagem?: string | null
+          imagem_url?: string | null
           nome: string
           preco?: number
+          quantidade_estoque?: number
           unidade?: string | null
         }
         Update: {
+          ativo?: boolean | null
           categoria?: string | null
-          codigo?: string | null
+          codigo_produto?: string | null
           created_at?: string
-          estoque?: number
+          descricao?: string | null
           id?: string
-          imagem?: string | null
+          imagem_url?: string | null
           nome?: string
           preco?: number
+          quantidade_estoque?: number
           unidade?: string | null
         }
         Relationships: []
+      }
+      vendas: {
+        Row: {
+          cliente_id: string | null
+          data_venda: string
+          id: string
+          observacoes: string | null
+          tipo_pagamento: string | null
+          valor_total: number
+        }
+        Insert: {
+          cliente_id?: string | null
+          data_venda?: string
+          id?: string
+          observacoes?: string | null
+          tipo_pagamento?: string | null
+          valor_total: number
+        }
+        Update: {
+          cliente_id?: string | null
+          data_venda?: string
+          id?: string
+          observacoes?: string | null
+          tipo_pagamento?: string | null
+          valor_total?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendas_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

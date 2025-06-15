@@ -4,6 +4,53 @@ import { Produto } from '@/types/produto';
 
 export type NewProduto = Omit<Produto, 'id' | 'created_at'>;
 
+// Interface para o formato de dados vindo do banco (com colunas renomeadas)
+interface ProdutoFromDB {
+  id: string;
+  created_at: string;
+  nome: string;
+  preco: number;
+  unidade: string | null;
+  categoria: string | null;
+  codigo_produto: string | null;
+  quantidade_estoque: number;
+  imagem_url: string | null;
+  descricao: string | null;
+  ativo: boolean | null;
+}
+
+// Converte do formato do banco para o formato da aplicação
+const fromDB = (p: ProdutoFromDB): Produto => ({
+  id: p.id,
+  created_at: p.created_at,
+  nome: p.nome,
+  preco: p.preco,
+  unidade: p.unidade || 'UN',
+  categoria: p.categoria || '',
+  codigo: p.codigo_produto || '',
+  estoque: p.quantidade_estoque || 0,
+  imagem: p.imagem_url || '/placeholder.svg',
+  descricao: p.descricao || '',
+  ativo: p.ativo ?? true,
+});
+
+// Converte do formato da aplicação para o formato do banco
+const toDB = (p: Partial<Produto>): Partial<ProdutoFromDB> => {
+    const dbProduct: { [key: string]: any } = {};
+
+    if (p.nome !== undefined) dbProduct.nome = p.nome;
+    if (p.preco !== undefined) dbProduct.preco = p.preco;
+    if (p.unidade !== undefined) dbProduct.unidade = p.unidade;
+    if (p.categoria !== undefined) dbProduct.categoria = p.categoria;
+    if (p.codigo !== undefined) dbProduct.codigo_produto = p.codigo;
+    if (p.estoque !== undefined) dbProduct.quantidade_estoque = p.estoque;
+    if (p.imagem !== undefined) dbProduct.imagem_url = p.imagem;
+    if (p.descricao !== undefined) dbProduct.descricao = p.descricao;
+    if (p.ativo !== undefined) dbProduct.ativo = p.ativo;
+
+    return dbProduct;
+};
+
 export const getProdutos = async (): Promise<Produto[]> => {
   const { data, error } = await supabase.from('produtos').select('*').order('created_at', { ascending: false });
 
@@ -12,35 +59,32 @@ export const getProdutos = async (): Promise<Produto[]> => {
     throw new Error('Não foi possível buscar os produtos.');
   }
 
-  return data as Produto[];
+  return (data as ProdutoFromDB[]).map(fromDB);
 };
 
-export const createProduto = async (produtoData: Omit<Produto, 'id' | 'unidade' | 'imagem' | 'created_at'> & { imagem?: string }): Promise<Produto> => {
-    const newProduct: NewProduto = {
-        ...produtoData,
-        imagem: produtoData.imagem || "/placeholder.svg",
-        unidade: "UN",
-    };
+export const createProduto = async (produtoData: NewProduto): Promise<Produto> => {
+    const productToInsert = toDB(produtoData);
 
     const { data, error } = await supabase
         .from('produtos')
-        .insert(newProduct)
+        .insert(productToInsert)
         .select()
         .single();
 
     if (error) {
-        console.error('Erro ao criar produto:', error);
+        console.error('Erro ao criar produto:', error.message);
         throw new Error('Não foi possível criar o produto.');
     }
 
-    return data as Produto;
+    return fromDB(data as ProdutoFromDB);
 };
 
 export const updateProduto = async (produtoData: Produto): Promise<Produto> => {
+    const { id, ...updateData } = produtoData;
     const { data, error } = await supabase
         .from('produtos')
-        .update(produtoData)
-        .eq('id', produtoData.id)
+        .update(toDB(updateData))
+        .eq('id', id)
         .select()
         .single();
     
@@ -49,7 +93,7 @@ export const updateProduto = async (produtoData: Produto): Promise<Produto> => {
         throw new Error('Não foi possível atualizar o produto.');
     }
 
-    return data as Produto;
+    return fromDB(data as ProdutoFromDB);
 };
 
 export const deleteProduto = async (id: string): Promise<void> => {

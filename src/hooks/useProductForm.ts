@@ -1,8 +1,9 @@
+
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { ProductSchema, sanitizeInput, validateImageFile } from "@/lib/validation";
 import { logSecurityEvent } from "@/lib/security";
-import { Produto } from "@/types/produto";
+import { Produto, NewProduto } from "@/types/produto";
 
 interface UseProductFormProps {
   initialProduct: Produto | null;
@@ -14,12 +15,12 @@ export const useProductForm = ({ initialProduct, onSave, onOpenChange }: UseProd
   const [formData, setFormData] = useState({
     nome: initialProduct?.nome || "",
     codigo: initialProduct?.codigo || "",
-    descricao: "",
+    descricao: initialProduct?.descricao || "",
     preco: initialProduct?.preco?.toString() || "",
     estoque: initialProduct?.estoque?.toString() || "",
     unidade: initialProduct?.unidade || "UN",
     categoria: initialProduct?.categoria || "",
-    ativo: true,
+    ativo: initialProduct?.ativo ?? true,
     imagem: initialProduct?.imagem || ""
   });
 
@@ -31,12 +32,12 @@ export const useProductForm = ({ initialProduct, onSave, onOpenChange }: UseProd
       setFormData({
         nome: initialProduct.nome,
         codigo: initialProduct.codigo,
-        descricao: "",
+        descricao: initialProduct.descricao || "",
         preco: initialProduct.preco.toString(),
         estoque: initialProduct.estoque.toString(),
         unidade: initialProduct.unidade || "UN",
         categoria: initialProduct.categoria,
-        ativo: true,
+        ativo: initialProduct.ativo ?? true,
         imagem: initialProduct.imagem,
       });
       setErrors({});
@@ -91,10 +92,12 @@ export const useProductForm = ({ initialProduct, onSave, onOpenChange }: UseProd
         estoque: parseInt(formData.estoque) || 0,
         imagem: formData.imagem,
         unidade: formData.unidade,
+        descricao: sanitizeInput(formData.descricao),
+        ativo: formData.ativo,
       };
       onSave(updatedProduct);
     } else {
-      const newProductData = {
+      const newProductData: NewProduto = {
         nome: sanitizeInput(formData.nome),
         codigo: sanitizeInput(formData.codigo).toUpperCase(),
         categoria: sanitizeInput(formData.categoria),
@@ -102,6 +105,8 @@ export const useProductForm = ({ initialProduct, onSave, onOpenChange }: UseProd
         estoque: parseInt(formData.estoque) || 0,
         imagem: formData.imagem,
         unidade: formData.unidade,
+        descricao: sanitizeInput(formData.descricao),
+        ativo: formData.ativo,
       };
       onSave(newProductData);
     }

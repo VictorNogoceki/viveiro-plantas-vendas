@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 
 // Interface que representa o dado como ele vem do banco de dados (snake_case)
@@ -11,6 +10,7 @@ interface ClienteFromDB {
   telefone: string;
   email: string | null;
   tipo: string | null;
+  data_cadastro: string | null;
 }
 
 // Interface usada na aplicação (camelCase)
@@ -22,6 +22,7 @@ export interface Cliente {
   telefone: string;
   email: string;
   tipo: 'cpf' | 'cnpj';
+  dataCadastro?: string;
 }
 
 // Tipo para criar um novo cliente, sem o 'id'
@@ -36,6 +37,7 @@ const fromDB = (cliente: ClienteFromDB): Cliente => ({
     telefone: cliente.telefone,
     email: cliente.email || '',
     tipo: cliente.tipo === 'cnpj' ? 'cnpj' : 'cpf', // padrão para cpf
+    dataCadastro: cliente.data_cadastro || cliente.created_at,
 });
 
 // Função para converter do formato da aplicação para o formato do DB
