@@ -21,6 +21,11 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useEffect } from "react";
+import { X } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
+import { validateImageFile } from "@/lib/validation";
+import { logSecurityEvent } from "@/lib/security";
 
 const productSchema = z.object({
   codigo: z.string().min(1, "Código é obrigatório"),
@@ -28,7 +33,7 @@ const productSchema = z.object({
   categoria: z.string().min(1, "Categoria é obrigatória"),
   estoque: z.coerce.number().min(0, "Estoque não pode ser negativo"),
   preco: z.coerce.number().min(0, "Preço não pode ser negativo"),
-  imagem: z.string().url("URL da imagem inválida").or(z.literal("")).optional(),
+  imagem: z.string().optional(),
 });
 
 type ProductFormValues = z.infer<typeof productSchema>;
@@ -51,6 +56,7 @@ const NovoProductDialog = ({ open, onOpenChange, onSave }: NovoProductDialogProp
       imagem: "",
     },
   });
+  const { toast } = useToast();
 
   const onSubmit = (data: ProductFormValues) => {
     onSave(data);
@@ -62,6 +68,27 @@ const NovoProductDialog = ({ open, onOpenChange, onSave }: NovoProductDialogProp
       form.reset();
     }
   }, [open, form]);
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const validation = validateImageFile(file);
+    if (!validation.isValid) {
+      toast({
+        title: "Arquivo Inválido",
+        description: validation.error,
+        variant: "destructive"
+      });
+      logSecurityEvent('Invalid file upload attempt', { fileName: file.name, fileType: file.type, fileSize: file.size });
+      return;
+    }
+
+    const imageUrl = URL.createObjectURL(file);
+    form.setValue("imagem", imageUrl, { shouldValidate: true });
+  };
+
+  const imageUrl = form.watch("imagem");
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -141,19 +168,47 @@ const NovoProductDialog = ({ open, onOpenChange, onSave }: NovoProductDialogProp
                 )}
               />
             </div>
-            <FormField
-              control={form.control}
-              name="imagem"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>URL da Imagem</FormLabel>
-                  <FormControl>
-                    <Input placeholder="https://exemplo.com/imagem.png" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+            
+            <div className="space-y-2">
+              <Label>Imagem do Produto</Label>
+              <div className="flex items-center gap-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => document.getElementById('image-upload-novo')?.click()}
+                >
+                  Escolher arquivo
+                </Button>
+                {!imageUrl && <span className="text-sm text-gray-500">Nenhum arquivo escolhido</span>}
+                <Input
+                  id="image-upload-novo"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                />
+              </div>
+              
+              {imageUrl && (
+                <div className="mt-4 relative w-32 h-32">
+                  <img
+                    src={imageUrl}
+                    alt="Preview"
+                    className="w-full h-full object-cover rounded-lg border-2 border-gray-200"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => form.setValue("imagem", "", { shouldValidate: true })}
+                    className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-red-500 text-white hover:bg-red-600"
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                </div>
               )}
-            />
+            </div>
+
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                 Cancelar
