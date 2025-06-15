@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { ProductSchema, sanitizeInput, validateImageFile } from "@/lib/validation";
@@ -7,7 +6,7 @@ import { Produto, NewProduto } from "@/types/produto";
 
 interface UseProductFormProps {
   initialProduct: Produto | null;
-  onSave: (produto: Produto | Omit<Produto, 'id' | 'created_at'>) => void;
+  onSave: (produto: Produto | NewProduto) => void;
   onOpenChange: (open: boolean) => void;
 }
 

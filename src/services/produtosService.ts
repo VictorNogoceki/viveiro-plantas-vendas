@@ -1,8 +1,5 @@
-
 import { supabase } from '@/integrations/supabase/client';
-import { Produto } from '@/types/produto';
-
-export type NewProduto = Omit<Produto, 'id' | 'created_at'>;
+import { Produto, NewProduto } from '@/types/produto';
 
 // Interface para o formato de dados vindo do banco (com colunas renomeadas)
 interface ProdutoFromDB {
@@ -63,7 +60,18 @@ export const getProdutos = async (): Promise<Produto[]> => {
 };
 
 export const createProduto = async (produtoData: NewProduto): Promise<Produto> => {
-    const productToInsert = toDB(produtoData);
+    // Manually construct the object to insert to avoid type issues with toDB
+    const productToInsert = {
+        nome: produtoData.nome,
+        preco: produtoData.preco,
+        unidade: produtoData.unidade,
+        categoria: produtoData.categoria,
+        codigo_produto: produtoData.codigo,
+        quantidade_estoque: produtoData.estoque,
+        imagem_url: produtoData.imagem,
+        descricao: produtoData.descricao,
+        ativo: produtoData.ativo,
+    };
 
     const { data, error } = await supabase
         .from('produtos')

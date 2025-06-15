@@ -26,6 +26,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { validateImageFile } from "@/lib/validation";
 import { logSecurityEvent } from "@/lib/security";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const productSchema = z.object({
   codigo: z.string().min(1, "Código é obrigatório"),
@@ -33,6 +34,7 @@ const productSchema = z.object({
   categoria: z.string().min(1, "Categoria é obrigatória"),
   estoque: z.coerce.number().min(0, "Estoque não pode ser negativo"),
   preco: z.coerce.number().min(0, "Preço não pode ser negativo"),
+  unidade: z.string().default("UN"),
   imagem: z.string().optional(),
 });
 
@@ -53,6 +55,7 @@ const NovoProductDialog = ({ open, onOpenChange, onSave }: NovoProductDialogProp
       categoria: "",
       estoque: 0,
       preco: 0,
+      unidade: "UN",
       imagem: "",
     },
   });
@@ -168,6 +171,30 @@ const NovoProductDialog = ({ open, onOpenChange, onSave }: NovoProductDialogProp
                 )}
               />
             </div>
+
+            <FormField
+              control={form.control}
+              name="unidade"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Unidade</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione a unidade" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="UN">Unidade (UN)</SelectItem>
+                      <SelectItem value="KG">Quilograma (KG)</SelectItem>
+                      <SelectItem value="LT">Litro (LT)</SelectItem>
+                      <SelectItem value="MT">Metro (MT)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             
             <div className="space-y-2">
               <Label>Imagem do Produto</Label>
@@ -223,4 +250,3 @@ const NovoProductDialog = ({ open, onOpenChange, onSave }: NovoProductDialogProp
 };
 
 export default NovoProductDialog;
-

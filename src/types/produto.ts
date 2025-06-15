@@ -12,3 +12,5 @@ export interface Produto {
   descricao?: string;
   ativo?: boolean;
 }
+
+export type NewProduto = Omit<Produto, 'id' | 'created_at'>;

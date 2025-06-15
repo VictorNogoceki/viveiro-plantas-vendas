@@ -1,9 +1,8 @@
-
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ProductForm } from "@/components/ProductForm";
 import { useProductForm } from "@/hooks/useProductForm";
-import { Produto } from "@/types/produto";
+import { Produto, NewProduto } from "@/types/produto";
 
 interface EditProductDialogProps {
   produto: Produto | null;
@@ -15,7 +14,7 @@ interface EditProductDialogProps {
 const EditProductDialog = ({ produto, open, onOpenChange, onSave }: EditProductDialogProps) => {
   const formLogic = useProductForm({
     initialProduct: produto,
-    onSave: onSave as (p: Produto | Omit<Produto, 'id' | 'created_at'>) => void,
+    onSave: onSave as (p: Produto | NewProduto) => void,
     onOpenChange,
   });
 
@@ -47,4 +46,3 @@ const EditProductDialog = ({ produto, open, onOpenChange, onSave }: EditProductD
 };
 
 export default EditProductDialog;
-

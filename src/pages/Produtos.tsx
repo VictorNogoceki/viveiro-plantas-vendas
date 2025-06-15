@@ -1,9 +1,8 @@
-
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import EditProductDialog from "@/components/EditProductDialog";
 import NovoProductDialog from "@/components/NovoProductDialog";
-import { Produto } from "@/types/produto";
+import { Produto, NewProduto } from "@/types/produto";
 import ProductHeader from "@/components/produtos/ProductHeader";
 import ProductSearch from "@/components/produtos/ProductSearch";
 import ProductTable from "@/components/produtos/ProductTable";
@@ -98,8 +97,19 @@ const Produtos = () => {
     updateMutation.mutate(updatedProduct);
   };
 
-  const handleCreateProduct = (newProductData: Omit<Produto, 'id' | 'unidade' | 'imagem' | 'created_at'> & { imagem?: string | undefined }) => {
-    createMutation.mutate(newProductData);
+  const handleCreateProduct = (newProductData: Partial<NewProduto>) => {
+    const productToCreate: NewProduto = {
+      nome: newProductData.nome || "",
+      codigo: newProductData.codigo || "",
+      categoria: newProductData.categoria || "",
+      preco: newProductData.preco || 0,
+      estoque: newProductData.estoque || 0,
+      unidade: newProductData.unidade || "UN",
+      imagem: newProductData.imagem || "/placeholder.svg",
+      descricao: newProductData.descricao || "",
+      ativo: newProductData.ativo ?? true,
+    };
+    createMutation.mutate(productToCreate);
   };
 
   const handleDelete = (produto: Produto) => {
@@ -142,7 +152,7 @@ const Produtos = () => {
         <NovoProductDialog
           open={isNovoProdutoDialogOpen}
           onOpenChange={setIsNovoProdutoDialogOpen}
-          onSave={handleCreateProduct}
+          onSave={handleCreateProduct as (data: any) => void}
         />
       </div>
     </div>
