@@ -68,7 +68,7 @@ const Index = () => {
         <div className="flex items-center justify-center gap-3 mb-4">
           <Leaf className="h-8 w-8 text-viveiro-green" />
           <h1 className="text-2xl font-bold text-viveiro-gray-dark">
-            Dashboard - Viveiro <span className="text-viveiro-green">EBENEZER</span>
+            Dashboard - Viveiro <span className="text-viveiro-yellow">EBENEZER</span>
           </h1>
         </div>
         <p className="text-viveiro-gray-dark/70">

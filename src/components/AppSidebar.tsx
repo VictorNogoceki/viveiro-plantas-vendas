@@ -70,7 +70,7 @@ export function AppSidebar() {
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel className="text-viveiro-gray-dark text-lg font-bold mb-4">
-            Viveiro <span className="text-viveiro-green">EBENEZER</span>
+            Viveiro <span className="text-viveiro-yellow">EBENEZER</span>
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>

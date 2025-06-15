@@ -46,10 +46,11 @@
     --sidebar-border: 142 76% 36%;
     --sidebar-ring: 142 76% 36%;
 
-    /* Custom colors for the viveiro theme - only gray and green */
+    /* Custom colors for the viveiro theme - gray, green and yellow only for EBENEZER */
     --viveiro-gray: 220 13% 91%;
     --viveiro-gray-dark: 220 13% 18%;
     --viveiro-green: 142 76% 36%;
+    --viveiro-yellow: 45 93% 47%;
   }
 
   .dark {
