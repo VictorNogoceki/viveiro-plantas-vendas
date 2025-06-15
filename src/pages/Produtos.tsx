@@ -10,16 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
 import EditProductDialog from "@/components/EditProductDialog";
 import NovoProductDialog from "@/components/NovoProductDialog";
-
-interface Produto {
-  id: number;
-  codigo: string;
-  nome: string;
-  categoria: string;
-  estoque: number;
-  preco: number;
-  imagem: string;
-}
+import { Produto } from "@/types/produto";
 
 const Produtos = () => {
   const [produtos, setProdutos] = useState<Produto[]>([

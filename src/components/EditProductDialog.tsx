@@ -1,26 +1,9 @@
 
-import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { X } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { ProductSchema, sanitizeInput, validateImageFile } from "@/lib/validation";
-import { logSecurityEvent } from "@/lib/security";
-
-interface Produto {
-  id: number;
-  codigo: string;
-  nome: string;
-  categoria: string;
-  estoque: number;
-  preco: number;
-  imagem: string;
-}
+import { ProductForm } from "@/components/ProductForm";
+import { useProductForm } from "@/hooks/useProductForm";
+import { Produto } from "@/types/produto";
 
 interface EditProductDialogProps {
   produto: Produto | null;
@@ -30,290 +13,29 @@ interface EditProductDialogProps {
 }
 
 const EditProductDialog = ({ produto, open, onOpenChange, onSave }: EditProductDialogProps) => {
-  const [formData, setFormData] = useState({
-    nome: produto?.nome || "",
-    codigo: produto?.codigo || "",
-    descricao: "",
-    preco: produto?.preco?.toString() || "",
-    estoque: produto?.estoque?.toString() || "",
-    unidade: "UN",
-    categoria: produto?.categoria || "",
-    ativo: true,
-    imagem: produto?.imagem || ""
+  const formLogic = useProductForm({
+    initialProduct: produto,
+    onSave,
+    onOpenChange,
   });
 
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const { toast } = useToast();
-
-  useEffect(() => {
-    if (produto) {
-      setFormData({
-        nome: produto.nome,
-        codigo: produto.codigo,
-        descricao: "",
-        preco: produto.preco.toString(),
-        estoque: produto.estoque.toString(),
-        unidade: "UN",
-        categoria: produto.categoria,
-        ativo: true,
-        imagem: produto.imagem,
-      });
-      setErrors({});
-    }
-  }, [produto]);
-
-  const validateForm = (): boolean => {
-    try {
-      ProductSchema.parse(formData);
-      setErrors({});
-      return true;
-    } catch (error: any) {
-      const newErrors: Record<string, string> = {};
-      error.errors?.forEach((err: any) => {
-        newErrors[err.path[0]] = err.message;
-      });
-      setErrors(newErrors);
-      logSecurityEvent('Form validation failed', { errors: newErrors });
-      return false;
-    }
-  };
-
-  const handleSave = () => {
-    if (!produto || !validateForm()) {
-      toast({
-        title: "Erro de Validação",
-        description: "Por favor, corrija os erros no formulário.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    const updatedProduct: Produto = {
-      ...produto,
-      nome: sanitizeInput(formData.nome),
-      codigo: sanitizeInput(formData.codigo).toUpperCase(),
-      categoria: sanitizeInput(formData.categoria),
-      preco: parseFloat(formData.preco) || 0,
-      estoque: parseInt(formData.estoque) || 0,
-      imagem: formData.imagem,
-    };
-
-    onSave(updatedProduct);
-    onOpenChange(false);
-    
-    toast({
-      title: "Produto Atualizado",
-      description: `${formData.nome} foi atualizado com sucesso!`,
-    });
-  };
-
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    const validation = validateImageFile(file);
-    if (!validation.isValid) {
-      toast({
-        title: "Arquivo Inválido",
-        description: validation.error,
-        variant: "destructive"
-      });
-      logSecurityEvent('Invalid file upload attempt', { fileName: file.name, fileType: file.type, fileSize: file.size });
-      return;
-    }
-
-    const imageUrl = URL.createObjectURL(file);
-    setFormData(prev => ({ ...prev, imagem: imageUrl }));
-  };
-
-  const handleInputChange = (field: string, value: string) => {
-    const sanitizedValue = sanitizeInput(value);
-    setFormData(prev => ({ ...prev, [field]: sanitizedValue }));
-    
-    // Clear error when user starts typing
-    if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }));
-    }
-  };
+  if (!open) return null;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>
-            Editar Produto
-          </DialogTitle>
+          <DialogTitle>Editar Produto</DialogTitle>
           <DialogDescription>
             Faça as alterações no seu produto e clique em 'Atualizar Produto' quando terminar.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
-          <div className="space-y-2">
-            <Label htmlFor="nome" className="text-sm font-medium text-red-500">
-              * Nome do Produto
-            </Label>
-            <Input
-              id="nome"
-              value={formData.nome}
-              onChange={(e) => handleInputChange('nome', e.target.value)}
-              placeholder="Nome do produto"
-              maxLength={100}
-              className={errors.nome ? "border-red-500" : ""}
-            />
-            {errors.nome && <p className="text-sm text-red-500">{errors.nome}</p>}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="codigo" className="text-sm font-medium text-red-500">
-              * Código
-            </Label>
-            <Input
-              id="codigo"
-              value={formData.codigo}
-              onChange={(e) => handleInputChange('codigo', e.target.value)}
-              placeholder="Código do produto"
-              maxLength={20}
-              className={errors.codigo ? "border-red-500" : ""}
-            />
-            {errors.codigo && <p className="text-sm text-red-500">{errors.codigo}</p>}
-          </div>
-
-          <div className="md:col-span-2 space-y-2">
-            <Label htmlFor="descricao" className="text-sm font-medium">
-              Descrição
-            </Label>
-            <Textarea
-              id="descricao"
-              value={formData.descricao}
-              onChange={(e) => handleInputChange('descricao', e.target.value)}
-              placeholder="DESCRIÇÃO DO PRODUTO"
-              className={`min-h-[100px] ${errors.descricao ? "border-red-500" : ""}`}
-              maxLength={500}
-            />
-            {errors.descricao && <p className="text-sm text-red-500">{errors.descricao}</p>}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="preco" className="text-sm font-medium text-red-500">
-              * Preço
-            </Label>
-            <Input
-              id="preco"
-              value={formData.preco}
-              onChange={(e) => handleInputChange('preco', e.target.value)}
-              placeholder="R$ 0,00"
-              className={errors.preco ? "border-red-500" : ""}
-            />
-            {errors.preco && <p className="text-sm text-red-500">{errors.preco}</p>}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="estoque" className="text-sm font-medium text-red-500">
-              * Estoque
-            </Label>
-            <Input
-              id="estoque"
-              value={formData.estoque}
-              onChange={(e) => handleInputChange('estoque', e.target.value)}
-              placeholder="Quantidade"
-              className={errors.estoque ? "border-red-500" : ""}
-            />
-            {errors.estoque && <p className="text-sm text-red-500">{errors.estoque}</p>}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="categoria" className="text-sm font-medium text-red-500">
-              * Categoria
-            </Label>
-            <Input
-              id="categoria"
-              value={formData.categoria}
-              onChange={(e) => handleInputChange('categoria', e.target.value)}
-              placeholder="Categoria"
-              maxLength={50}
-              className={errors.categoria ? "border-red-500" : ""}
-            />
-            {errors.categoria && <p className="text-sm text-red-500">{errors.categoria}</p>}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="unidade" className="text-sm font-medium text-red-500">
-              * Unidade
-            </Label>
-            <Select value={formData.unidade} onValueChange={(value) => setFormData(prev => ({ ...prev, unidade: value }))}>
-              <SelectTrigger className={errors.unidade ? "border-red-500" : ""}>
-                <SelectValue placeholder="Selecione a unidade" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="UN">Unidade (UN)</SelectItem>
-                <SelectItem value="KG">Quilograma (KG)</SelectItem>
-                <SelectItem value="LT">Litro (LT)</SelectItem>
-                <SelectItem value="MT">Metro (MT)</SelectItem>
-              </SelectContent>
-            </Select>
-            {errors.unidade && <p className="text-sm text-red-500">{errors.unidade}</p>}
-          </div>
-
-          <div className="md:col-span-2 space-y-4">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="ativo" className="text-sm font-medium">
-                Ativo
-              </Label>
-              <Switch
-                id="ativo"
-                checked={formData.ativo}
-                onCheckedChange={(checked) => setFormData(prev => ({ ...prev, ativo: checked }))}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">
-                Imagem do Produto
-              </Label>
-              <div className="flex items-center gap-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => document.getElementById('image-upload')?.click()}
-                >
-                  Escolher arquivo
-                </Button>
-                <span className="text-sm text-gray-500">Nenhum arquivo escolhido</span>
-                <input
-                  id="image-upload"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="hidden"
-                />
-              </div>
-              
-              {formData.imagem && (
-                <div className="mt-4 relative">
-                  <img
-                    src={formData.imagem}
-                    alt="Preview"
-                    className="w-32 h-32 object-cover rounded-lg border-2 border-gray-200"
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setFormData(prev => ({ ...prev, imagem: "" }))}
-                    className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-red-500 text-white hover:bg-red-600"
-                  >
-                    <X className="h-3 w-3" />
-                  </Button>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
+        <ProductForm {...formLogic} />
 
         <div className="flex justify-start pt-4">
           <Button 
-            onClick={handleSave}
+            onClick={formLogic.handleSave}
             className="bg-viveiro-green hover:bg-viveiro-green/90 text-white"
           >
             Atualizar Produto
