@@ -2,89 +2,122 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getProdutos } from "@/services/produtosService";
+import { getMovimentacoes } from "@/services/movimentacaoEstoqueService";
 import { Produto } from "@/types/produto";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { PlusCircle, Search } from "lucide-react";
+import { MovimentacaoItem } from "@/types/movimentacao";
+import ProductStockTable from "@/components/estoque/ProductStockTable";
+import StockHistoryTable from "@/components/estoque/StockHistoryTable";
+import MovimentacaoEstoqueModal from "@/components/MovimentacaoEstoqueModal";
+import { toast } from "@/components/ui/use-toast";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Package, History } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const Estoque = () => {
-  const { data: produtos = [], isLoading } = useQuery<Produto[]>({
+  const [activeTab, setActiveTab] = useState("estoque");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Produto | undefined>(undefined);
+  const [historyFilter, setHistoryFilter] = useState<string | null>(null);
+
+  const { data: produtos = [], isLoading: isLoadingProdutos } = useQuery<Produto[]>({
     queryKey: ['produtos'],
     queryFn: getProdutos,
   });
 
-  const [searchTerm, setSearchTerm] = useState("");
+  const { data: movimentacoes = [], isLoading: isLoadingMovimentacoes } = useQuery<MovimentacaoItem[]>({
+    queryKey: ['movimentacoesEstoque'],
+    queryFn: getMovimentacoes,
+  });
 
-  const filteredProdutos = produtos.filter(p => 
-    p.nome.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    p.codigo?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const handleNovaMovimentacao = (produto?: Produto) => {
+    setSelectedProduct(produto);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedProduct(undefined);
+  };
+  
+  const handleSaveMovimentacao = (movimentacao: { produtoId: string; tipo: string; quantidade: number; descricao: string; }) => {
+    // A lógica de salvar será implementada em seguida.
+    // Por enquanto, esta ação está desabilitada para focarmos na restauração da interface.
+    console.log("Tentativa de salvar movimentação:", movimentacao);
+    toast({
+      title: "Em desenvolvimento",
+      description: "A função de salvar a movimentação de estoque será habilitada em breve.",
+      variant: "default",
+    });
+    handleCloseModal();
+  };
+
+  const handleViewHistory = (produtoNome: string) => {
+    setHistoryFilter(produtoNome);
+    setActiveTab("historico");
+  };
+
+  const handleClearHistoryFilter = () => {
+    setHistoryFilter(null);
+  };
+
+  const isLoading = isLoadingProdutos || isLoadingMovimentacoes;
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-gray-900">Controle de Estoque</h1>
-        <Button disabled> {/* Funcionalidade será reativada no futuro */}
-          <PlusCircle className="mr-2 h-4 w-4" />
-          Nova Movimentação
-        </Button>
-      </div>
+      <h1 className="text-3xl font-bold text-gray-900">Controle de Estoque</h1>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Produtos em Estoque</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="relative mb-4">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-              <Input
-                placeholder="Buscar produto por nome ou código..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-          </div>
-          <div className="border rounded-lg">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Código</TableHead>
-                  <TableHead>Produto</TableHead>
-                  <TableHead>Categoria</TableHead>
-                  <TableHead className="text-right">Estoque Atual</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {isLoading ? (
-                  Array.from({ length: 5 }).map((_, i) => (
-                    <TableRow key={i}>
-                      <TableCell colSpan={4}><Skeleton className="h-8 w-full" /></TableCell>
-                    </TableRow>
-                  ))
-                ) : filteredProdutos.length > 0 ? (
-                  filteredProdutos.map(produto => (
-                    <TableRow key={produto.id}>
-                      <TableCell className="font-mono">{produto.codigo}</TableCell>
-                      <TableCell>{produto.nome}</TableCell>
-                      <TableCell>{produto.categoria}</TableCell>
-                      <TableCell className="text-right font-medium">{produto.estoque} {produto.unidade}</TableCell>
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={4} className="text-center text-gray-500 py-4">Nenhum produto encontrado.</TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </CardContent>
-      </Card>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full max-w-md grid-cols-2">
+          <TabsTrigger value="estoque" className="gap-2">
+            <Package className="h-4 w-4" />
+            Estoque de Produtos
+          </TabsTrigger>
+          <TabsTrigger value="historico" className="gap-2">
+            <History className="h-4 w-4" />
+            Histórico de Movimentações
+          </TabsTrigger>
+        </TabsList>
+        <Card className="mt-4">
+          <CardContent className="p-6">
+            <TabsContent value="estoque">
+              {isLoading ? (
+                <Skeleton className="h-[400px] w-full" />
+              ) : (
+                <ProductStockTable 
+                  produtos={produtos} 
+                  onNovaMovimentacao={handleNovaMovimentacao}
+                  onViewHistory={handleViewHistory}
+                />
+              )}
+            </TabsContent>
+            <TabsContent value="historico">
+              {isLoading ? (
+                <Skeleton className="h-[400px] w-full" />
+              ) : (
+                <StockHistoryTable
+                  movimentacoes={movimentacoes}
+                  historyFilter={historyFilter}
+                  onClearFilter={handleClearHistoryFilter}
+                />
+              )}
+            </TabsContent>
+          </CardContent>
+        </Card>
+      </Tabs>
+      
+      {isModalOpen && (
+        <MovimentacaoEstoqueModal
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          produto={selectedProduct}
+          produtos={produtos}
+          onSave={handleSaveMovimentacao}
+        />
+      )}
     </div>
   );
 };
 
 export default Estoque;
+
