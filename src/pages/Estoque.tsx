@@ -121,7 +121,7 @@ const Estoque = () => {
           <BreadcrumbList>
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
-                <Link to="/" className="text-green-600">Home</Link>
+                <Link to="/" className="text-primary">Home</Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator>
@@ -155,7 +155,7 @@ const Estoque = () => {
             <div className="flex items-center justify-between mb-6">
               <Button 
                 onClick={() => handleNovaMovimentacao()}
-                className="bg-green-500 hover:bg-green-600 text-white gap-2 rounded-md"
+                className="bg-primary hover:bg-primary/90 text-white gap-2 rounded-md"
               >
                 <Plus className="h-4 w-4" />
                 Nova Movimentação
@@ -192,11 +192,11 @@ const Estoque = () => {
                       <TableCell className="text-gray-700">{item.categoria}</TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <span className={item.status === "baixo" ? "text-green-600 font-semibold" : "text-gray-900"}>
+                          <span className={item.status === "baixo" ? "text-primary font-semibold" : "text-gray-900"}>
                             {item.estoque} {item.unidade}
                           </span>
                           {item.status === "baixo" && (
-                            <Badge className="bg-green-100 text-green-600 text-xs border-green-200">
+                            <Badge variant="secondary" className="bg-primary/10 text-primary text-xs border-primary/20">
                               Baixo
                             </Badge>
                           )}
@@ -207,7 +207,7 @@ const Estoque = () => {
                           <Button 
                             size="sm" 
                             onClick={() => handleNovaMovimentacao(item)}
-                            className="bg-green-500 hover:bg-green-600 text-white gap-1 text-xs px-3 py-1 h-8"
+                            className="bg-primary hover:bg-primary/90 text-white gap-1 text-xs px-3 py-1 h-8"
                           >
                             <Plus className="h-3 w-3" />
                             Movimentar
@@ -241,13 +241,13 @@ const Estoque = () => {
               <Pagination>
                 <PaginationContent>
                   <PaginationItem>
-                    <PaginationPrevious href="#" className="text-green-600" />
+                    <PaginationPrevious href="#" className="text-primary" />
                   </PaginationItem>
                   <PaginationItem>
-                    <PaginationLink href="#" isActive className="bg-green-600 text-white border-green-600">1</PaginationLink>
+                    <PaginationLink href="#" isActive className="bg-primary text-white border-primary">1</PaginationLink>
                   </PaginationItem>
                   <PaginationItem>
-                    <PaginationNext href="#" className="text-green-600" />
+                    <PaginationNext href="#" className="text-primary" />
                   </PaginationItem>
                 </PaginationContent>
               </Pagination>
