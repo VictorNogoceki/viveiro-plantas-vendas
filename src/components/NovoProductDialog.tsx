@@ -20,13 +20,14 @@ import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useEffect } from "react";
-import { X } from "lucide-react";
+import { useState, useEffect } from "react";
+import { X, Loader2 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { validateImageFile } from "@/lib/validation";
 import { logSecurityEvent } from "@/lib/security";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { uploadProdutoImage } from "@/services/storageService";
 
 const productSchema = z.object({
   codigo: z.string().min(1, "Código é obrigatório"),
@@ -60,6 +61,7 @@ const NovoProductDialog = ({ open, onOpenChange, onSave }: NovoProductDialogProp
     },
   });
   const { toast } = useToast();
+  const [isUploading, setIsUploading] = useState(false);
 
   const onSubmit = (data: ProductFormValues) => {
     onSave(data);
@@ -69,10 +71,11 @@ const NovoProductDialog = ({ open, onOpenChange, onSave }: NovoProductDialogProp
   useEffect(() => {
     if (!open) {
       form.reset();
+      setIsUploading(false);
     }
   }, [open, form]);
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -87,8 +90,23 @@ const NovoProductDialog = ({ open, onOpenChange, onSave }: NovoProductDialogProp
       return;
     }
 
-    const imageUrl = URL.createObjectURL(file);
-    form.setValue("imagem", imageUrl, { shouldValidate: true });
+    setIsUploading(true);
+    try {
+        const imageUrl = await uploadProdutoImage(file);
+        form.setValue("imagem", imageUrl, { shouldValidate: true });
+        toast({
+            title: "Upload Concluído",
+            description: "A imagem do produto foi carregada com sucesso."
+        });
+    } catch(error) {
+        toast({
+            title: "Erro no Upload",
+            description: (error as Error).message,
+            variant: "destructive"
+        });
+    } finally {
+        setIsUploading(false);
+    }
   };
 
   const imageUrl = form.watch("imagem");
@@ -203,8 +221,10 @@ const NovoProductDialog = ({ open, onOpenChange, onSave }: NovoProductDialogProp
                   type="button"
                   variant="outline"
                   onClick={() => document.getElementById('image-upload-novo')?.click()}
+                  disabled={isUploading}
                 >
-                  Escolher arquivo
+                  {isUploading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {isUploading ? 'Carregando...' : 'Escolher arquivo'}
                 </Button>
                 {!imageUrl && <span className="text-sm text-gray-500">Nenhum arquivo escolhido</span>}
                 <Input
@@ -240,7 +260,9 @@ const NovoProductDialog = ({ open, onOpenChange, onSave }: NovoProductDialogProp
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                 Cancelar
               </Button>
-              <Button type="submit">Salvar</Button>
+              <Button type="submit" disabled={isUploading}>
+                {isUploading ? "Aguarde..." : "Salvar"}
+              </Button>
             </DialogFooter>
           </form>
         </Form>

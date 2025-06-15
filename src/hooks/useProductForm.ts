@@ -3,6 +3,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ProductSchema, sanitizeInput, validateImageFile } from "@/lib/validation";
 import { logSecurityEvent } from "@/lib/security";
 import { Produto, NewProduto } from "@/types/produto";
+import { uploadProdutoImage } from "@/services/storageService";
 
 interface UseProductFormProps {
   initialProduct: Produto | null;
@@ -23,6 +24,7 @@ export const useProductForm = ({ initialProduct, onSave, onOpenChange }: UseProd
     imagem: initialProduct?.imagem || ""
   });
 
+  const [isUploading, setIsUploading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const { toast } = useToast();
 
@@ -114,7 +116,7 @@ export const useProductForm = ({ initialProduct, onSave, onOpenChange }: UseProd
     // so no need to call it here.
   };
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -128,9 +130,24 @@ export const useProductForm = ({ initialProduct, onSave, onOpenChange }: UseProd
       logSecurityEvent('Invalid file upload attempt', { fileName: file.name, fileType: file.type, fileSize: file.size });
       return;
     }
-
-    const imageUrl = URL.createObjectURL(file);
-    setFormData(prev => ({ ...prev, imagem: imageUrl }));
+    
+    setIsUploading(true);
+    try {
+      const imageUrl = await uploadProdutoImage(file);
+      setFormData(prev => ({ ...prev, imagem: imageUrl }));
+      toast({
+        title: "Upload Concluído",
+        description: "A imagem do produto foi carregada com sucesso."
+      });
+    } catch (error) {
+       toast({
+        title: "Erro no Upload",
+        description: (error as Error).message,
+        variant: "destructive"
+      });
+    } finally {
+        setIsUploading(false);
+    }
   };
 
   const handleInputChange = (field: string, value: string) => {
@@ -149,5 +166,6 @@ export const useProductForm = ({ initialProduct, onSave, onOpenChange }: UseProd
     handleInputChange,
     handleImageUpload,
     handleSave,
+    isUploading,
   };
 };

@@ -1,3 +1,4 @@
+
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ProductForm } from "@/components/ProductForm";
@@ -30,14 +31,15 @@ const EditProductDialog = ({ produto, open, onOpenChange, onSave }: EditProductD
           </DialogDescription>
         </DialogHeader>
 
-        <ProductForm {...formLogic} />
+        <ProductForm {...formLogic} isUploading={formLogic.isUploading} />
 
         <div className="flex justify-start pt-4">
           <Button 
             onClick={formLogic.handleSave}
             className="bg-viveiro-green hover:bg-viveiro-green/90 text-white"
+            disabled={formLogic.isUploading}
           >
-            Atualizar Produto
+            {formLogic.isUploading ? "Aguarde o upload..." : "Atualizar Produto"}
           </Button>
         </div>
       </DialogContent>

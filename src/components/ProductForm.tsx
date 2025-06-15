@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { X } from "lucide-react";
+import { X, Loader2 } from "lucide-react";
 
 interface ProductFormProps {
   formData: any;
@@ -14,6 +14,7 @@ interface ProductFormProps {
   errors: Record<string, string>;
   handleInputChange: (field: string, value: string) => void;
   handleImageUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  isUploading?: boolean;
 }
 
 export const ProductForm = ({
@@ -22,6 +23,7 @@ export const ProductForm = ({
   errors,
   handleInputChange,
   handleImageUpload,
+  isUploading,
 }: ProductFormProps) => {
   return (
     <>
@@ -153,8 +155,10 @@ export const ProductForm = ({
                 type="button"
                 variant="outline"
                 onClick={() => document.getElementById('image-upload-edit')?.click()}
+                disabled={isUploading}
               >
-                Escolher arquivo
+                {isUploading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {isUploading ? 'Carregando...' : 'Escolher arquivo'}
               </Button>
               <span className="text-sm text-gray-500">Nenhum arquivo escolhido</span>
               <input

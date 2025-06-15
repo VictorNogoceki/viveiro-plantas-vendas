@@ -58,13 +58,7 @@ export const getProdutos = async (): Promise<Produto[]> => {
 
   const produtos = (data as ProdutoFromDB[]).map(fromDB);
 
-  // Substitui a imagem do produto "alface" por um placeholder
-  return produtos.map(p => {
-    if (p.nome.toLowerCase() === 'alface') {
-      return { ...p, imagem: 'https://images.pexels.com/photos/2893636/pexels-photo-2893636.jpeg' };
-    }
-    return p;
-  });
+  return produtos;
 };
 
 export const createProduto = async (produtoData: NewProduto): Promise<Produto> => {
