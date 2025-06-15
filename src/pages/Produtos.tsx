@@ -101,14 +101,14 @@ const Produtos = () => {
           <BreadcrumbList>
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
-                <Link to="/" className="text-orange-600">Dashboard</Link>
+                <Link to="/" className="text-viveiro-green">Dashboard</Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator>
               <span className="text-gray-400">/</span>
             </BreadcrumbSeparator>
             <BreadcrumbItem>
-              <BreadcrumbPage className="text-gray-900">Produtos</BreadcrumbPage>
+              <BreadcrumbPage className="text-viveiro-gray-dark">Produtos</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
@@ -116,9 +116,9 @@ const Produtos = () => {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Lista de Produtos</h1>
+            <h1 className="text-2xl font-bold text-viveiro-gray-dark">Lista de Produtos</h1>
           </div>
-          <Button className="bg-orange-500 hover:bg-orange-600 text-white gap-2">
+          <Button className="bg-viveiro-green hover:bg-viveiro-green/90 text-white gap-2">
             <Plus className="h-4 w-4" />
             Novo Produto
           </Button>
@@ -167,23 +167,23 @@ const Produtos = () => {
                     <TableCell className="font-mono text-sm">{produto.codigo}</TableCell>
                     <TableCell className="font-medium">{produto.nome}</TableCell>
                     <TableCell>
-                      <span className={produto.categoria === "ÓLEO" ? "text-orange-600" : "text-gray-900"}>
+                      <span className="text-viveiro-gray-dark">
                         {produto.categoria}
                       </span>
                     </TableCell>
                     <TableCell>
-                      <span className={produto.estoque <= 10 ? "text-red-600 font-semibold" : "text-gray-900"}>
+                      <span className={produto.estoque <= 10 ? "text-red-600 font-semibold" : "text-viveiro-gray-dark"}>
                         {produto.estoque}
                       </span>
                     </TableCell>
-                    <TableCell className="font-medium">R$ {produto.preco.toFixed(2)}</TableCell>
+                    <TableCell className="font-medium text-viveiro-gray-dark">R$ {produto.preco.toFixed(2)}</TableCell>
                     <TableCell className="text-right">
                       <div className="flex gap-2 justify-end">
                         <Button 
                           size="sm" 
                           variant="ghost"
                           onClick={() => handleEdit(produto)}
-                          className="text-gray-500 hover:text-orange-600 p-1"
+                          className="text-gray-500 hover:text-viveiro-green p-1"
                         >
                           <Edit className="h-4 w-4" />
                         </Button>

@@ -45,7 +45,7 @@ const SelecaoProdutos: React.FC<SelecaoProdutosProps> = ({
         <CardTitle className="flex items-center justify-between">
           <span>Produtos</span>
           <Button variant="outline" size="sm" className="gap-2">
-            <span className="text-orange-500">|||</span>
+            <span className="text-viveiro-green">|||</span>
             Simular Leitor
           </Button>
         </CardTitle>
@@ -65,7 +65,7 @@ const SelecaoProdutos: React.FC<SelecaoProdutosProps> = ({
         {/* Tabs */}
         <Tabs defaultValue="lista" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="lista" className="data-[state=active]:bg-blue-500 data-[state=active]:text-white">
+            <TabsTrigger value="lista" className="data-[state=active]:bg-viveiro-green data-[state=active]:text-white">
               Lista de Produtos
             </TabsTrigger>
             <TabsTrigger value="populares">Populares</TabsTrigger>
@@ -87,7 +87,7 @@ const SelecaoProdutos: React.FC<SelecaoProdutosProps> = ({
                     <TableRow 
                       key={produto.id} 
                       className={`hover:bg-gray-50 cursor-pointer ${
-                        produtoSelecionado?.id === produto.id ? 'bg-orange-50' : ''
+                        produtoSelecionado?.id === produto.id ? 'bg-viveiro-green/10' : ''
                       }`}
                       onClick={() => setProdutoSelecionado(produto)}
                     >
@@ -103,7 +103,7 @@ const SelecaoProdutos: React.FC<SelecaoProdutosProps> = ({
                             e.stopPropagation();
                             adicionarAoCarrinho(produto);
                           }}
-                          className="bg-orange-500 hover:bg-orange-600 text-white w-8 h-8 p-0"
+                          className="bg-viveiro-green hover:bg-viveiro-green/90 text-white w-8 h-8 p-0"
                           disabled={produto.estoque === 0}
                         >
                           <Plus className="h-4 w-4" />

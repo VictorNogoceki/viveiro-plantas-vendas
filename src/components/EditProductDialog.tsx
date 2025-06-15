@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -230,7 +231,7 @@ const EditProductDialog = ({ produto, open, onOpenChange, onSave }: EditProductD
         <div className="flex justify-start pt-4">
           <Button 
             onClick={handleSave}
-            className="bg-orange-500 hover:bg-orange-600 text-white"
+            className="bg-viveiro-green hover:bg-viveiro-green/90 text-white"
           >
             Atualizar Produto
           </Button>
