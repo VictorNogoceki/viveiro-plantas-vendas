@@ -1,10 +1,18 @@
 
 import { useState } from "react";
-import { FileText, Plus } from "lucide-react";
+import { FileText, Plus, ChevronDown, ShoppingCart, FilePlus2, FileUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const NotasFiscais = () => {
   const [notas, setNotas] = useState([
@@ -20,14 +28,43 @@ const NotasFiscais = () => {
 
   const { toast } = useToast();
 
+  const handleMenuClick = (feature: string) => {
+    toast({
+      title: "Em desenvolvimento",
+      description: `A funcionalidade de "${feature}" será implementada em breve.`,
+    });
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold text-gray-900">Notas Fiscais</h1>
-        <Button className="gap-2">
-          <Plus className="h-4 w-4" />
-          Nova Nota Fiscal
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              Nova Nota Fiscal
+              <ChevronDown className="ml-2 h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>Criar Nova Nota</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => handleMenuClick('Criar a partir de uma Venda')}>
+              <ShoppingCart className="mr-2 h-4 w-4" />
+              <span>A partir de uma Venda</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleMenuClick('Criar Nota Fiscal Avulsa')}>
+              <FilePlus2 className="mr-2 h-4 w-4" />
+              <span>Nota Fiscal Avulsa</span>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => handleMenuClick('Importar XML')}>
+              <FileUp className="mr-2 h-4 w-4" />
+              <span>Importar XML</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       <Card>
