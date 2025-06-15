@@ -166,7 +166,7 @@ const Pedidos = () => {
                 <TableRow
                   key={pedido.id}
                   onClick={() => setSelectedPedidoId(selectedPedidoId === pedido.id ? null : pedido.id)}
-                  className="cursor-pointer animate-fade-in"
+                  className="cursor-pointer animate-fade-in data-[state=selected]:bg-green-100"
                   style={{ animationDelay: `${index * 50}ms`, animationFillMode: 'backwards' }}
                   data-state={selectedPedidoId === pedido.id ? "selected" : undefined}
                 >

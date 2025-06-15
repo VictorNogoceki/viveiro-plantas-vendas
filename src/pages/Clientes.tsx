@@ -127,7 +127,7 @@ const Clientes = () => {
                   <TableRow
                     key={cliente.id}
                     onClick={() => setSelectedClientId(selectedClientId === cliente.id ? null : cliente.id)}
-                    className="cursor-pointer animate-fade-in"
+                    className="cursor-pointer animate-fade-in data-[state=selected]:bg-green-100"
                     style={{ animationDelay: `${index * 50}ms`, animationFillMode: 'backwards' }}
                     data-state={selectedClientId === cliente.id ? "selected" : undefined}
                   >
