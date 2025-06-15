@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { ClipboardList, Plus, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -36,6 +35,7 @@ const Pedidos = () => {
     telefone: '',
     descricao: ''
   });
+  const [selectedPedidoId, setSelectedPedidoId] = useState<number | null>(null);
 
   const { toast } = useToast();
 
@@ -162,8 +162,14 @@ const Pedidos = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {pedidos.map((pedido) => (
-                <TableRow key={pedido.id}>
+              {pedidos.map((pedido, index) => (
+                <TableRow
+                  key={pedido.id}
+                  onClick={() => setSelectedPedidoId(selectedPedidoId === pedido.id ? null : pedido.id)}
+                  className="cursor-pointer animate-fade-in"
+                  style={{ animationDelay: `${index * 50}ms`, animationFillMode: 'backwards' }}
+                  data-state={selectedPedidoId === pedido.id ? "selected" : undefined}
+                >
                   <TableCell className="font-medium">{pedido.nomeCliente}</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-1">
@@ -186,7 +192,8 @@ const Pedidos = () => {
                     <select
                       value={pedido.status}
                       onChange={(e) => updateStatus(pedido.id, e.target.value as any)}
-                      className="text-xs border rounded px-2 py-1"
+                      onClick={(e) => e.stopPropagation()}
+                      className="text-xs border rounded px-2 py-1 bg-transparent"
                     >
                       <option value="Pendente">Pendente</option>
                       <option value="Em andamento">Em andamento</option>
