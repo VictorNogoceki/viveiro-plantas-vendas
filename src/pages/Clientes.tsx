@@ -46,6 +46,7 @@ const Clientes = () => {
   const [showNovoClienteModal, setShowNovoClienteModal] = useState(false);
   const [editingClient, setEditingClient] = useState<Cliente | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedClientId, setSelectedClientId] = useState<number | null>(null);
 
   const { toast } = useToast();
 
@@ -122,8 +123,14 @@ const Clientes = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {clientes.map((cliente) => (
-                  <TableRow key={cliente.id}>
+                {clientes.map((cliente, index) => (
+                  <TableRow
+                    key={cliente.id}
+                    onClick={() => setSelectedClientId(selectedClientId === cliente.id ? null : cliente.id)}
+                    className="cursor-pointer animate-fade-in"
+                    style={{ animationDelay: `${index * 50}ms`, animationFillMode: 'backwards' }}
+                    data-state={selectedClientId === cliente.id ? "selected" : undefined}
+                  >
                     <TableCell className="font-medium">{cliente.nome}</TableCell>
                     <TableCell>{cliente.cpfCnpj}</TableCell>
                     <TableCell>{cliente.telefone}</TableCell>
@@ -134,7 +141,10 @@ const Clientes = () => {
                         <Button
                           variant="outline"
                           size="icon"
-                          onClick={() => handleEdit(cliente)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEdit(cliente)
+                          }}
                           className="h-8 w-8"
                         >
                           <Edit className="h-4 w-4" />
@@ -145,6 +155,7 @@ const Clientes = () => {
                               variant="outline"
                               size="icon"
                               className="h-8 w-8 text-red-600 hover:text-red-700"
+                              onClick={(e) => e.stopPropagation()}
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
