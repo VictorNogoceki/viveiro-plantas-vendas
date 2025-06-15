@@ -36,6 +36,8 @@ const Estoque = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [produtoSelecionado, setProdutoSelecionado] = useState<EstoqueItem | undefined>();
+  const [activeTab, setActiveTab] = useState("produtos");
+  const [historyFilter, setHistoryFilter] = useState<string | null>(null);
 
   const estoqueItems: EstoqueItem[] = [
     {
@@ -103,6 +105,10 @@ const Estoque = () => {
     item.categoria.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const filteredMovimentacoes = historyFilter
+    ? movimentacoes.filter(mov => mov.produto.toLowerCase() === historyFilter.toLowerCase())
+    : movimentacoes;
+
   const handleNovaMovimentacao = (produto?: EstoqueItem) => {
     setProdutoSelecionado(produto);
     setIsModalOpen(true);
@@ -111,6 +117,11 @@ const Estoque = () => {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setProdutoSelecionado(undefined);
+  };
+
+  const handleViewHistory = (produtoNome: string) => {
+    setHistoryFilter(produtoNome);
+    setActiveTab("historico");
   };
 
   return (
@@ -134,7 +145,7 @@ const Estoque = () => {
         </Breadcrumb>
 
         {/* Tabs */}
-        <Tabs defaultValue="produtos" className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-fit grid-cols-2 mb-6 bg-white border-b">
             <TabsTrigger 
               value="produtos" 
@@ -215,6 +226,7 @@ const Estoque = () => {
                           <Button 
                             size="sm" 
                             variant="outline"
+                            onClick={() => handleViewHistory(item.nome)}
                             className="gap-1 text-xs px-3 py-1 h-8 border-gray-300 text-gray-600 hover:bg-gray-50"
                           >
                             <History className="h-3 w-3" />
@@ -255,6 +267,22 @@ const Estoque = () => {
           </TabsContent>
 
           <TabsContent value="historico">
+            {historyFilter && (
+              <div className="flex items-center justify-between mb-4 bg-blue-50 p-3 rounded-lg border border-blue-200">
+                <p className="text-sm text-blue-800">
+                  Mostrando histórico para: <span className="font-semibold">{historyFilter}</span>
+                </p>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setHistoryFilter(null)}
+                  className="text-blue-600 hover:bg-blue-100"
+                >
+                  <RotateCcw className="h-4 w-4 mr-2" />
+                  Limpar filtro
+                </Button>
+              </div>
+            )}
             <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
               <Table>
                 <TableHeader>
@@ -268,22 +296,32 @@ const Estoque = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {movimentacoes.map((mov) => (
-                    <TableRow key={mov.id} className="hover:bg-gray-50 border-b border-gray-100">
-                      <TableCell className="font-mono text-sm text-gray-900">{mov.data}</TableCell>
-                      <TableCell>
-                        <Badge 
-                          className={mov.tipo === "entrada" ? "bg-green-100 text-green-700 border-green-200" : "bg-red-100 text-red-700 border-red-200"}
-                        >
-                          {mov.tipo === "entrada" ? "Entrada" : "Saída"}
-                        </Badge>
+                  {filteredMovimentacoes.length > 0 ? (
+                    filteredMovimentacoes.map((mov) => (
+                      <TableRow key={mov.id} className="hover:bg-gray-50 border-b border-gray-100">
+                        <TableCell className="font-mono text-sm text-gray-900">{mov.data}</TableCell>
+                        <TableCell>
+                          <Badge 
+                            className={mov.tipo === "entrada" ? "bg-green-100 text-green-700 border-green-200" : "bg-red-100 text-red-700 border-red-200"}
+                          >
+                            {mov.tipo === "entrada" ? "Entrada" : "Saída"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="font-medium text-gray-900">{mov.produto}</TableCell>
+                        <TableCell className="text-gray-900">{mov.quantidade}</TableCell>
+                        <TableCell className="text-gray-900">{mov.usuario}</TableCell>
+                        <TableCell className="text-gray-600">{mov.observacao}</TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center py-12 text-gray-500">
+                        <History className="h-10 w-10 mx-auto mb-3 opacity-50" />
+                        <p className="font-medium">Nenhum histórico de movimentação encontrado</p>
+                        {historyFilter && <p className="text-sm mt-1">Nenhuma movimentação para este produto.</p>}
                       </TableCell>
-                      <TableCell className="font-medium text-gray-900">{mov.produto}</TableCell>
-                      <TableCell className="text-gray-900">{mov.quantidade}</TableCell>
-                      <TableCell className="text-gray-900">{mov.usuario}</TableCell>
-                      <TableCell className="text-gray-600">{mov.observacao}</TableCell>
                     </TableRow>
-                  ))}
+                  )}
                 </TableBody>
               </Table>
             </div>
