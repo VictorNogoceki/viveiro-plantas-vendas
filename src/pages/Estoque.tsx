@@ -1,10 +1,9 @@
-
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getProdutos } from "@/services/produtosService";
-import { getMovimentacoes } from "@/services/movimentacaoEstoqueService";
+import { getMovimentacoes, createMovimentacao } from "@/services/movimentacaoEstoqueService";
 import { Produto } from "@/types/produto";
-import { MovimentacaoItem } from "@/types/movimentacao";
+import { MovimentacaoItem, NewMovimentacao } from "@/types/movimentacao";
 import ProductStockTable from "@/components/estoque/ProductStockTable";
 import StockHistoryTable from "@/components/estoque/StockHistoryTable";
 import MovimentacaoEstoqueModal from "@/components/MovimentacaoEstoqueModal";
@@ -19,6 +18,7 @@ const Estoque = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Produto | undefined>(undefined);
   const [historyFilter, setHistoryFilter] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
   const { data: produtos = [], isLoading: isLoadingProdutos } = useQuery<Produto[]>({
     queryKey: ['produtos'],
@@ -28,6 +28,26 @@ const Estoque = () => {
   const { data: movimentacoes = [], isLoading: isLoadingMovimentacoes } = useQuery<MovimentacaoItem[]>({
     queryKey: ['movimentacoesEstoque'],
     queryFn: getMovimentacoes,
+  });
+
+  const movimentacaoMutation = useMutation({
+    mutationFn: createMovimentacao,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['produtos'] });
+      queryClient.invalidateQueries({ queryKey: ['movimentacoesEstoque'] });
+      toast({
+        title: "Movimentação registrada!",
+        description: "O estoque foi atualizado com sucesso.",
+      });
+      handleCloseModal();
+    },
+    onError: (error) => {
+      toast({
+        title: "Erro ao registrar movimentação",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
   });
 
   const handleNovaMovimentacao = (produto?: Produto) => {
@@ -40,16 +60,14 @@ const Estoque = () => {
     setSelectedProduct(undefined);
   };
   
-  const handleSaveMovimentacao = (movimentacao: { produtoId: string; tipo: string; quantidade: number; descricao: string; }) => {
-    // A lógica de salvar será implementada em seguida.
-    // Por enquanto, esta ação está desabilitada para focarmos na restauração da interface.
-    console.log("Tentativa de salvar movimentação:", movimentacao);
-    toast({
-      title: "Em desenvolvimento",
-      description: "A função de salvar a movimentação de estoque será habilitada em breve.",
-      variant: "default",
-    });
-    handleCloseModal();
+  const handleSaveMovimentacao = (movimentacao: { produtoId: string; tipo: "entrada" | "saida"; quantidade: number; descricao: string; }) => {
+    const newMov: NewMovimentacao = {
+      produtoId: movimentacao.produtoId,
+      tipo: movimentacao.tipo,
+      quantidade: movimentacao.quantidade,
+      motivo: movimentacao.descricao,
+    };
+    movimentacaoMutation.mutate(newMov);
   };
 
   const handleViewHistory = (produtoNome: string) => {
@@ -120,4 +138,3 @@ const Estoque = () => {
 };
 
 export default Estoque;
-

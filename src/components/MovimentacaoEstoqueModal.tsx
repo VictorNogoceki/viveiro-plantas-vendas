@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -17,7 +18,7 @@ interface MovimentacaoEstoqueModalProps {
   produtos: Produto[];
   onSave: (movimentacao: {
     produtoId: string;
-    tipo: string;
+    tipo: 'entrada' | 'saida';
     quantidade: number;
     descricao: string;
   }) => void;
@@ -25,7 +26,7 @@ interface MovimentacaoEstoqueModalProps {
 
 const MovimentacaoEstoqueModal = ({ isOpen, onClose, produto, produtos, onSave }: MovimentacaoEstoqueModalProps) => {
   const [produtoSelecionado, setProdutoSelecionado] = useState("");
-  const [tipoMovimentacao, setTipoMovimentacao] = useState("");
+  const [tipoMovimentacao, setTipoMovimentacao] = useState<'entrada' | 'saida' | ''>('');
   const [quantidade, setQuantidade] = useState("");
   const [descricao, setDescricao] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -76,7 +77,7 @@ const MovimentacaoEstoqueModal = ({ isOpen, onClose, produto, produtos, onSave }
 
     onSave({
       produtoId: produtoSelecionado,
-      tipo: tipoMovimentacao,
+      tipo: tipoMovimentacao as 'entrada' | 'saida',
       quantidade: parseInt(quantidade),
       descricao: sanitizeInput(descricao)
     });
@@ -137,7 +138,7 @@ const MovimentacaoEstoqueModal = ({ isOpen, onClose, produto, produtos, onSave }
             <Label className="text-sm font-medium text-gray-900">
               * Tipo de Movimentação
             </Label>
-            <Select value={tipoMovimentacao} onValueChange={setTipoMovimentacao}>
+            <Select value={tipoMovimentacao} onValueChange={(value) => setTipoMovimentacao(value as 'entrada' | 'saida')}>
               <SelectTrigger className={`w-full ${errors.tipoMovimentacao ? "border-red-500" : ""}`}>
                 <SelectValue placeholder="Selecione o tipo de movimentação" />
               </SelectTrigger>

@@ -8,3 +8,10 @@ export interface MovimentacaoItem {
   usuario: string;
   observacao?: string;
 }
+
+export interface NewMovimentacao {
+  produtoId: string;
+  tipo: 'entrada' | 'saida';
+  quantidade: number;
+  motivo: string;
+}

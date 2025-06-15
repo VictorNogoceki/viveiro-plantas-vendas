@@ -1,6 +1,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { MovimentacaoItem } from '@/types/movimentacao';
+import { MovimentacaoItem, NewMovimentacao } from '@/types/movimentacao';
 
 interface MovimentacaoFromDB {
   id: string;
@@ -44,3 +44,25 @@ export const getMovimentacoes = async (): Promise<MovimentacaoItem[]> => {
   return (data as any[]).map(fromDB);
 };
 
+export const createMovimentacao = async (movimentacao: NewMovimentacao) => {
+  const { data, error } = await supabase
+    .from('movimentacao_estoque')
+    .insert({
+      produto_id: movimentacao.produtoId,
+      tipo: movimentacao.tipo,
+      quantidade: movimentacao.quantidade,
+      motivo: movimentacao.motivo,
+    })
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Erro ao criar movimentação de estoque:', error);
+    if (error.message.includes('Estoque insuficiente')) {
+        throw new Error('Estoque insuficiente para realizar a saída.');
+    }
+    throw new Error('Não foi possível registrar a movimentação.');
+  }
+
+  return data;
+};
