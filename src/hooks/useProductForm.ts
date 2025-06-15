@@ -101,6 +101,7 @@ export const useProductForm = ({ initialProduct, onSave, onOpenChange }: UseProd
         preco: parseFloat(formData.preco) || 0,
         estoque: parseInt(formData.estoque) || 0,
         imagem: formData.imagem,
+        unidade: formData.unidade,
       };
       onSave(newProductData);
     }

@@ -1,19 +1,11 @@
-
 import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Printer } from 'lucide-react';
+import { Produto } from '@/types/produto';
 
 interface ItemCarrinho {
-  produto: {
-    id: number;
-    codigo: string;
-    nome: string;
-    categoria: string;
-    estoque: number;
-    preco: number;
-    imagem: string;
-  };
+  produto: Produto;
   quantidade: number;
   total: number;
 }
