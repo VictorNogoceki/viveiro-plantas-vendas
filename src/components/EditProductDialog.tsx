@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+
+import { useState, useEffect } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -44,6 +45,23 @@ const EditProductDialog = ({ produto, open, onOpenChange, onSave }: EditProductD
   const [errors, setErrors] = useState<Record<string, string>>({});
   const { toast } = useToast();
 
+  useEffect(() => {
+    if (produto) {
+      setFormData({
+        nome: produto.nome,
+        codigo: produto.codigo,
+        descricao: "",
+        preco: produto.preco.toString(),
+        estoque: produto.estoque.toString(),
+        unidade: "UN",
+        categoria: produto.categoria,
+        ativo: true,
+        imagem: produto.imagem,
+      });
+      setErrors({});
+    }
+  }, [produto]);
+
   const validateForm = (): boolean => {
     try {
       ProductSchema.parse(formData);
@@ -77,6 +95,7 @@ const EditProductDialog = ({ produto, open, onOpenChange, onSave }: EditProductD
       categoria: sanitizeInput(formData.categoria),
       preco: parseFloat(formData.preco) || 0,
       estoque: parseInt(formData.estoque) || 0,
+      imagem: formData.imagem,
     };
 
     onSave(updatedProduct);
@@ -124,6 +143,9 @@ const EditProductDialog = ({ produto, open, onOpenChange, onSave }: EditProductD
           <DialogTitle>
             Editar Produto
           </DialogTitle>
+          <DialogDescription>
+            Faça as alterações no seu produto e clique em 'Atualizar Produto' quando terminar.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
