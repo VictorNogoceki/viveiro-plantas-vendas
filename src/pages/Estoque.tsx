@@ -82,7 +82,7 @@ const Estoque = () => {
             </Table>
           </div>
         </CardContent>
-      </Card>>
+      </Card>
     </div>
   );
 };
