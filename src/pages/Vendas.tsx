@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import CarrinhoCompras from "@/components/CarrinhoCompras";
@@ -30,7 +31,7 @@ const Vendas = () => {
   const { toast } = useToast();
   const [isFinalizarModalOpen, setIsFinalizarModalOpen] = useState(false);
   const [isComprovanteOpen, setIsComprovanteOpen] = useState(false);
-  const [ultimaVenda, setUltimaVenda: any] = useState<{
+  const [ultimaVenda, setUltimaVenda] = useState<{
     carrinho: ItemCarrinho[];
     subtotal: number;
     formasPagamento: { nome: string; valor: number }[];
