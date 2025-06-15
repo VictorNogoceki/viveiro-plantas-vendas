@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Package, Plus, Search, Edit, Trash2, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -10,6 +9,7 @@ import { Pagination, PaginationContent, PaginationItem, PaginationLink, Paginati
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
 import EditProductDialog from "@/components/EditProductDialog";
+import NovoProductDialog from "@/components/NovoProductDialog";
 
 interface Produto {
   id: number;
@@ -64,6 +64,7 @@ const Produtos = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedProduct, setSelectedProduct] = useState<Produto | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isNovoProdutoDialogOpen, setIsNovoProdutoDialogOpen] = useState(false);
   const { toast } = useToast();
 
   const filteredProdutos = produtos.filter(produto =>
@@ -83,6 +84,19 @@ const Produtos = () => {
         produto.id === updatedProduct.id ? updatedProduct : produto
       )
     );
+  };
+
+  const handleCreateProduct = (newProductData: Omit<Produto, "id" | "imagem"> & { imagem?: string | undefined }) => {
+    const newProduct: Produto = {
+      ...newProductData,
+      id: Math.max(...produtos.map(p => p.id), 0) + 1,
+      imagem: newProductData.imagem || "/placeholder.svg",
+    };
+    setProdutos(prev => [...prev, newProduct]);
+    toast({
+      title: "Produto Adicionado!",
+      description: `${newProduct.nome} foi cadastrado com sucesso.`,
+    });
   };
 
   const handleDelete = (produto: Produto) => {
@@ -118,7 +132,10 @@ const Produtos = () => {
           <div>
             <h1 className="text-2xl font-bold text-viveiro-gray-dark">Lista de Produtos</h1>
           </div>
-          <Button className="bg-viveiro-green hover:bg-viveiro-green/90 text-white gap-2">
+          <Button 
+            className="bg-viveiro-green hover:bg-viveiro-green/90 text-white gap-2"
+            onClick={() => setIsNovoProdutoDialogOpen(true)}
+          >
             <Plus className="h-4 w-4" />
             Novo Produto
           </Button>
@@ -235,6 +252,13 @@ const Produtos = () => {
           open={isEditDialogOpen}
           onOpenChange={setIsEditDialogOpen}
           onSave={handleSaveProduct}
+        />
+        
+        {/* Novo Produto Dialog */}
+        <NovoProductDialog
+          open={isNovoProdutoDialogOpen}
+          onOpenChange={setIsNovoProdutoDialogOpen}
+          onSave={handleCreateProduct}
         />
       </div>
     </div>
