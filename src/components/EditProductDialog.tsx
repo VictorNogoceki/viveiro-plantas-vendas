@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -9,6 +8,8 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { ProductSchema, sanitizeInput, validateImageFile } from "@/lib/validation";
+import { logSecurityEvent } from "@/lib/security";
 
 interface Produto {
   id: number;
@@ -40,16 +41,40 @@ const EditProductDialog = ({ produto, open, onOpenChange, onSave }: EditProductD
     imagem: produto?.imagem || ""
   });
 
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const { toast } = useToast();
 
+  const validateForm = (): boolean => {
+    try {
+      ProductSchema.parse(formData);
+      setErrors({});
+      return true;
+    } catch (error: any) {
+      const newErrors: Record<string, string> = {};
+      error.errors?.forEach((err: any) => {
+        newErrors[err.path[0]] = err.message;
+      });
+      setErrors(newErrors);
+      logSecurityEvent('Form validation failed', { errors: newErrors });
+      return false;
+    }
+  };
+
   const handleSave = () => {
-    if (!produto) return;
+    if (!produto || !validateForm()) {
+      toast({
+        title: "Erro de Validação",
+        description: "Por favor, corrija os erros no formulário.",
+        variant: "destructive"
+      });
+      return;
+    }
 
     const updatedProduct: Produto = {
       ...produto,
-      nome: formData.nome,
-      codigo: formData.codigo,
-      categoria: formData.categoria,
+      nome: sanitizeInput(formData.nome),
+      codigo: sanitizeInput(formData.codigo).toUpperCase(),
+      categoria: sanitizeInput(formData.categoria),
       preco: parseFloat(formData.preco) || 0,
       estoque: parseInt(formData.estoque) || 0,
     };
@@ -65,10 +90,30 @@ const EditProductDialog = ({ produto, open, onOpenChange, onSave }: EditProductD
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
-      // Simular upload de imagem
-      const imageUrl = URL.createObjectURL(file);
-      setFormData(prev => ({ ...prev, imagem: imageUrl }));
+    if (!file) return;
+
+    const validation = validateImageFile(file);
+    if (!validation.isValid) {
+      toast({
+        title: "Arquivo Inválido",
+        description: validation.error,
+        variant: "destructive"
+      });
+      logSecurityEvent('Invalid file upload attempt', { fileName: file.name, fileType: file.type, fileSize: file.size });
+      return;
+    }
+
+    const imageUrl = URL.createObjectURL(file);
+    setFormData(prev => ({ ...prev, imagem: imageUrl }));
+  };
+
+  const handleInputChange = (field: string, value: string) => {
+    const sanitizedValue = sanitizeInput(value);
+    setFormData(prev => ({ ...prev, [field]: sanitizedValue }));
+    
+    // Clear error when user starts typing
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: '' }));
     }
   };
 
@@ -89,9 +134,12 @@ const EditProductDialog = ({ produto, open, onOpenChange, onSave }: EditProductD
             <Input
               id="nome"
               value={formData.nome}
-              onChange={(e) => setFormData(prev => ({ ...prev, nome: e.target.value }))}
+              onChange={(e) => handleInputChange('nome', e.target.value)}
               placeholder="Nome do produto"
+              maxLength={100}
+              className={errors.nome ? "border-red-500" : ""}
             />
+            {errors.nome && <p className="text-sm text-red-500">{errors.nome}</p>}
           </div>
 
           <div className="space-y-2">
@@ -101,9 +149,12 @@ const EditProductDialog = ({ produto, open, onOpenChange, onSave }: EditProductD
             <Input
               id="codigo"
               value={formData.codigo}
-              onChange={(e) => setFormData(prev => ({ ...prev, codigo: e.target.value }))}
+              onChange={(e) => handleInputChange('codigo', e.target.value)}
               placeholder="Código do produto"
+              maxLength={20}
+              className={errors.codigo ? "border-red-500" : ""}
             />
+            {errors.codigo && <p className="text-sm text-red-500">{errors.codigo}</p>}
           </div>
 
           <div className="md:col-span-2 space-y-2">
@@ -113,10 +164,12 @@ const EditProductDialog = ({ produto, open, onOpenChange, onSave }: EditProductD
             <Textarea
               id="descricao"
               value={formData.descricao}
-              onChange={(e) => setFormData(prev => ({ ...prev, descricao: e.target.value }))}
+              onChange={(e) => handleInputChange('descricao', e.target.value)}
               placeholder="DESCRIÇÃO DO PRODUTO"
-              className="min-h-[100px]"
+              className={`min-h-[100px] ${errors.descricao ? "border-red-500" : ""}`}
+              maxLength={500}
             />
+            {errors.descricao && <p className="text-sm text-red-500">{errors.descricao}</p>}
           </div>
 
           <div className="space-y-2">
@@ -126,9 +179,11 @@ const EditProductDialog = ({ produto, open, onOpenChange, onSave }: EditProductD
             <Input
               id="preco"
               value={formData.preco}
-              onChange={(e) => setFormData(prev => ({ ...prev, preco: e.target.value }))}
+              onChange={(e) => handleInputChange('preco', e.target.value)}
               placeholder="R$ 0,00"
+              className={errors.preco ? "border-red-500" : ""}
             />
+            {errors.preco && <p className="text-sm text-red-500">{errors.preco}</p>}
           </div>
 
           <div className="space-y-2">
@@ -138,9 +193,11 @@ const EditProductDialog = ({ produto, open, onOpenChange, onSave }: EditProductD
             <Input
               id="estoque"
               value={formData.estoque}
-              onChange={(e) => setFormData(prev => ({ ...prev, estoque: e.target.value }))}
+              onChange={(e) => handleInputChange('estoque', e.target.value)}
               placeholder="Quantidade"
+              className={errors.estoque ? "border-red-500" : ""}
             />
+            {errors.estoque && <p className="text-sm text-red-500">{errors.estoque}</p>}
           </div>
 
           <div className="space-y-2">
@@ -150,9 +207,12 @@ const EditProductDialog = ({ produto, open, onOpenChange, onSave }: EditProductD
             <Input
               id="categoria"
               value={formData.categoria}
-              onChange={(e) => setFormData(prev => ({ ...prev, categoria: e.target.value }))}
+              onChange={(e) => handleInputChange('categoria', e.target.value)}
               placeholder="Categoria"
+              maxLength={50}
+              className={errors.categoria ? "border-red-500" : ""}
             />
+            {errors.categoria && <p className="text-sm text-red-500">{errors.categoria}</p>}
           </div>
 
           <div className="space-y-2">
@@ -160,7 +220,7 @@ const EditProductDialog = ({ produto, open, onOpenChange, onSave }: EditProductD
               * Unidade
             </Label>
             <Select value={formData.unidade} onValueChange={(value) => setFormData(prev => ({ ...prev, unidade: value }))}>
-              <SelectTrigger>
+              <SelectTrigger className={errors.unidade ? "border-red-500" : ""}>
                 <SelectValue placeholder="Selecione a unidade" />
               </SelectTrigger>
               <SelectContent>
@@ -170,6 +230,7 @@ const EditProductDialog = ({ produto, open, onOpenChange, onSave }: EditProductD
                 <SelectItem value="MT">Metro (MT)</SelectItem>
               </SelectContent>
             </Select>
+            {errors.unidade && <p className="text-sm text-red-500">{errors.unidade}</p>}
           </div>
 
           <div className="md:col-span-2 space-y-4">

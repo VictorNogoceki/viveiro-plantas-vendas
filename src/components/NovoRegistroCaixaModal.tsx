@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -6,6 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { CashFlowSchema, sanitizeInput } from "@/lib/validation";
+import { logSecurityEvent } from "@/lib/security";
+import { useToast } from "@/hooks/use-toast";
 
 interface NovoRegistroCaixaModalProps {
   isOpen: boolean;
@@ -19,12 +21,45 @@ const NovoRegistroCaixaModal = ({ isOpen, onClose, onConfirm }: NovoRegistroCaix
   const [descricao, setDescricao] = useState("");
   const [valor, setValor] = useState("");
   const [formaPagamento, setFormaPagamento] = useState("");
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const { toast } = useToast();
+
+  const validateForm = (): boolean => {
+    try {
+      CashFlowSchema.parse({
+        tipoMovimentacao,
+        data,
+        descricao,
+        valor,
+        formaPagamento: formaPagamento || undefined
+      });
+      setErrors({});
+      return true;
+    } catch (error: any) {
+      const newErrors: Record<string, string> = {};
+      error.errors?.forEach((err: any) => {
+        newErrors[err.path[0]] = err.message;
+      });
+      setErrors(newErrors);
+      logSecurityEvent('Cash flow form validation failed', { errors: newErrors });
+      return false;
+    }
+  };
 
   const handleSubmit = () => {
+    if (!validateForm()) {
+      toast({
+        title: "Erro de Validação",
+        description: "Por favor, corrija os erros no formulário.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     const novoRegistro = {
       id: Date.now(),
       data: new Date(data).toLocaleString('pt-BR'),
-      descricao,
+      descricao: sanitizeInput(descricao),
       tipo: tipoMovimentacao === "entrada" ? "Entrada" : "Saída",
       formaPagamento: formaPagamento,
       valor: parseFloat(valor.replace(',', '.')) || 0
@@ -39,7 +74,26 @@ const NovoRegistroCaixaModal = ({ isOpen, onClose, onConfirm }: NovoRegistroCaix
     setDescricao("");
     setValor("");
     setFormaPagamento("");
+    setErrors({});
     onClose();
+  };
+
+  const handleInputChange = (field: string, value: string) => {
+    const sanitizedValue = sanitizeInput(value);
+    
+    switch (field) {
+      case 'descricao':
+        setDescricao(sanitizedValue);
+        break;
+      case 'valor':
+        setValor(sanitizedValue);
+        break;
+    }
+    
+    // Clear error when user starts typing
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: '' }));
+    }
   };
 
   return (
@@ -58,7 +112,7 @@ const NovoRegistroCaixaModal = ({ isOpen, onClose, onConfirm }: NovoRegistroCaix
               * Tipo de Movimentação
             </Label>
             <Select value={tipoMovimentacao} onValueChange={setTipoMovimentacao}>
-              <SelectTrigger className="w-full">
+              <SelectTrigger className={`w-full ${errors.tipoMovimentacao ? "border-red-500" : ""}`}>
                 <SelectValue placeholder="Entrada" />
               </SelectTrigger>
               <SelectContent>
@@ -66,6 +120,7 @@ const NovoRegistroCaixaModal = ({ isOpen, onClose, onConfirm }: NovoRegistroCaix
                 <SelectItem value="saida">Saída</SelectItem>
               </SelectContent>
             </Select>
+            {errors.tipoMovimentacao && <p className="text-sm text-red-500">{errors.tipoMovimentacao}</p>}
           </div>
 
           {/* Data */}
@@ -77,8 +132,9 @@ const NovoRegistroCaixaModal = ({ isOpen, onClose, onConfirm }: NovoRegistroCaix
               type="datetime-local"
               value={data}
               onChange={(e) => setData(e.target.value)}
-              className="w-full"
+              className={`w-full ${errors.data ? "border-red-500" : ""}`}
             />
+            {errors.data && <p className="text-sm text-red-500">{errors.data}</p>}
           </div>
 
           {/* Descrição */}
@@ -89,9 +145,11 @@ const NovoRegistroCaixaModal = ({ isOpen, onClose, onConfirm }: NovoRegistroCaix
             <Textarea
               placeholder="Descrição da movimentação"
               value={descricao}
-              onChange={(e) => setDescricao(e.target.value)}
-              className="w-full min-h-[60px]"
+              onChange={(e) => handleInputChange('descricao', e.target.value)}
+              className={`w-full min-h-[60px] ${errors.descricao ? "border-red-500" : ""}`}
+              maxLength={200}
             />
+            {errors.descricao && <p className="text-sm text-red-500">{errors.descricao}</p>}
           </div>
 
           {/* Valor */}
@@ -106,11 +164,12 @@ const NovoRegistroCaixaModal = ({ isOpen, onClose, onConfirm }: NovoRegistroCaix
               <Input
                 type="text"
                 value={valor}
-                onChange={(e) => setValor(e.target.value)}
+                onChange={(e) => handleInputChange('valor', e.target.value)}
                 placeholder="0,00"
-                className="w-full pl-8"
+                className={`w-full pl-8 ${errors.valor ? "border-red-500" : ""}`}
               />
             </div>
+            {errors.valor && <p className="text-sm text-red-500">{errors.valor}</p>}
           </div>
 
           {/* Forma de Pagamento */}
@@ -146,8 +205,7 @@ const NovoRegistroCaixaModal = ({ isOpen, onClose, onConfirm }: NovoRegistroCaix
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={!tipoMovimentacao || !data || !descricao || !valor}
-            className="flex-1 bg-orange-500 hover:bg-orange-600 text-white"
+            className="flex-1 bg-viveiro-green hover:bg-viveiro-green/90 text-white"
           >
             OK
           </Button>
