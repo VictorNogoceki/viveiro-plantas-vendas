@@ -1,6 +1,6 @@
 
 export interface Produto {
-  id: number;
+  id: string;
   codigo: string;
   nome: string;
   categoria: string;
@@ -8,4 +8,5 @@ export interface Produto {
   preco: number;
   imagem: string;
   unidade: string;
+  created_at: string;
 }

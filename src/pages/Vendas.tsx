@@ -1,20 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import CarrinhoCompras from "@/components/CarrinhoCompras";
 import SelecaoProdutos from "@/components/SelecaoProdutos";
 import HeaderVendas from "@/components/HeaderVendas";
 import FinalizarVendaModal from "@/components/FinalizarVendaModal";
 import ComprovanteVenda from "@/components/ComprovanteVenda";
-
-interface Produto {
-  id: number;
-  codigo: string;
-  nome: string;
-  categoria: string;
-  estoque: number;
-  preco: number;
-  imagem: string;
-}
+import { useQuery } from "@tanstack/react-query";
+import { getProdutos } from "@/services/produtosService";
+import { Produto } from "@/types/produto";
 
 interface ItemCarrinho {
   produto: Produto;
@@ -23,49 +16,15 @@ interface ItemCarrinho {
 }
 
 const Vendas = () => {
-  const [produtos] = useState<Produto[]>([
-    {
-      id: 1,
-      codigo: "PLT001",
-      nome: "ROSA VERMELHA",
-      categoria: "Flores",
-      estoque: 25,
-      preco: 15.90,
-      imagem: "/lovable-uploads/f3ca6925-b6cb-459b-9eaa-422549153b2b.png"
-    },
-    {
-      id: 2,
-      codigo: "PLT002", 
-      nome: "SAMAMBAIA",
-      categoria: "Folhagem",
-      estoque: 8,
-      preco: 25.00,
-      imagem: "/lovable-uploads/4b16ca18-e502-4020-96ef-096f7dbea63d.png"
-    },
-    {
-      id: 3,
-      codigo: "PLT003",
-      nome: "SUCULENTA ECHEVERIA",
-      categoria: "Suculentas",
-      estoque: 45,
-      preco: 12.50,
-      imagem: "/lovable-uploads/76b52c52-e6fb-4664-beb4-5dfa62c8869d.png"
-    },
-    {
-      id: 4,
-      codigo: "PLT004",
-      nome: "ORQUÍDEA PHALAENOPSIS",
-      categoria: "Flores",
-      estoque: 5,
-      preco: 85.00,
-      imagem: "/lovable-uploads/56fd79a4-cedc-4c8d-a9fe-624dffa1d655.png"
-    }
-  ]);
+  const { data: produtos = [], isLoading: isLoadingProdutos } = useQuery<Produto[]>({
+    queryKey: ['produtos'],
+    queryFn: getProdutos,
+  });
 
   const [carrinho, setCarrinho] = useState<ItemCarrinho[]>([]);
   const [clienteSearch, setClienteSearch] = useState("");
   const [produtoSearch, setProdutoSearch] = useState("");
-  const [produtoSelecionado, setProdutoSelecionado] = useState<Produto | null>(produtos[0]);
+  const [produtoSelecionado, setProdutoSelecionado] = useState<Produto | null>(null);
   const { toast } = useToast();
   const [isFinalizarModalOpen, setIsFinalizarModalOpen] = useState(false);
   const [isComprovanteOpen, setIsComprovanteOpen] = useState(false);
@@ -75,6 +34,12 @@ const Vendas = () => {
     formasPagamento: { nome: string; valor: number }[];
     vendaId: string;
   } | null>(null);
+
+  useEffect(() => {
+    if (!produtoSelecionado && produtos.length > 0) {
+      setProdutoSelecionado(produtos[0]);
+    }
+  }, [produtos, produtoSelecionado]);
 
   const adicionarAoCarrinho = (produto: Produto) => {
     const itemExistente = carrinho.find(item => item.produto.id === produto.id);
@@ -99,11 +64,11 @@ const Vendas = () => {
     });
   };
 
-  const removerDoCarrinho = (produtoId: number) => {
+  const removerDoCarrinho = (produtoId: string) => {
     setCarrinho(carrinho.filter(item => item.produto.id !== produtoId));
   };
 
-  const atualizarQuantidade = (produtoId: number, novaQuantidade: number) => {
+  const atualizarQuantidade = (produtoId: string, novaQuantidade: number) => {
     if (novaQuantidade <= 0) {
       removerDoCarrinho(produtoId);
       return;
@@ -184,6 +149,7 @@ const Vendas = () => {
             produtoSelecionado={produtoSelecionado}
             setProdutoSelecionado={setProdutoSelecionado}
             adicionarAoCarrinho={adicionarAoCarrinho}
+            isLoading={isLoadingProdutos}
           />
         </div>
       </div>

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Plus, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -6,16 +5,8 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-
-interface Produto {
-  id: number;
-  codigo: string;
-  nome: string;
-  categoria: string;
-  estoque: number;
-  preco: number;
-  imagem: string;
-}
+import { Produto } from '@/types/produto';
+import { Skeleton } from './ui/skeleton';
 
 interface SelecaoProdutosProps {
   produtos: Produto[];
@@ -24,6 +15,7 @@ interface SelecaoProdutosProps {
   produtoSelecionado: Produto | null;
   setProdutoSelecionado: (produto: Produto) => void;
   adicionarAoCarrinho: (produto: Produto) => void;
+  isLoading: boolean;
 }
 
 const SelecaoProdutos: React.FC<SelecaoProdutosProps> = ({
@@ -32,7 +24,8 @@ const SelecaoProdutos: React.FC<SelecaoProdutosProps> = ({
   setProdutoSearch,
   produtoSelecionado,
   setProdutoSelecionado,
-  adicionarAoCarrinho
+  adicionarAoCarrinho,
+  isLoading
 }) => {
   const produtosFiltrados = produtos.filter(produto =>
     produto.nome.toLowerCase().includes(produtoSearch.toLowerCase()) ||
@@ -83,9 +76,24 @@ const SelecaoProdutos: React.FC<SelecaoProdutosProps> = ({
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {produtosFiltrados.map((produto) => (
-                    <TableRow 
-                      key={produto.id} 
+                  {isLoading ? (
+                    Array.from({ length: 5 }).map((_, index) => (
+                        <TableRow key={index}>
+                            <TableCell colSpan={4}>
+                                <Skeleton className="h-8 w-full" />
+                            </TableCell>
+                        </TableRow>
+                    ))
+                  ) : produtosFiltrados.length === 0 ? (
+                    <TableRow>
+                        <TableCell colSpan={4} className="text-center text-gray-500 py-8">
+                            Nenhum produto encontrado.
+                        </TableCell>
+                    </TableRow>
+                  ) : (
+                    produtosFiltrados.map((produto) => (
+                      <TableRow 
+                        key={produto.id} 
                       className={`hover:bg-gray-50 cursor-pointer ${
                         produtoSelecionado?.id === produto.id ? 'bg-viveiro-green/10' : ''
                       }`}
@@ -110,7 +118,8 @@ const SelecaoProdutos: React.FC<SelecaoProdutosProps> = ({
                         </Button>
                       </TableCell>
                     </TableRow>
-                  ))}
+                    ))
+                  )}
                 </TableBody>
               </Table>
             </div>

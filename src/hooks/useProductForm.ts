@@ -6,7 +6,7 @@ import { Produto } from "@/types/produto";
 
 interface UseProductFormProps {
   initialProduct: Produto | null;
-  onSave: (produto: Produto) => void;
+  onSave: (produto: Produto | Omit<Produto, 'id' | 'created_at'>) => void;
   onOpenChange: (open: boolean) => void;
 }
 
@@ -40,6 +40,18 @@ export const useProductForm = ({ initialProduct, onSave, onOpenChange }: UseProd
         imagem: initialProduct.imagem,
       });
       setErrors({});
+    } else {
+       setFormData({
+        nome: "",
+        codigo: "",
+        descricao: "",
+        preco: "",
+        estoque: "",
+        unidade: "UN",
+        categoria: "",
+        ativo: true,
+        imagem: ""
+      });
     }
   }, [initialProduct]);
 
@@ -60,7 +72,7 @@ export const useProductForm = ({ initialProduct, onSave, onOpenChange }: UseProd
   };
 
   const handleSave = () => {
-    if (!initialProduct || !validateForm()) {
+    if (!validateForm()) {
       toast({
         title: "Erro de Validação",
         description: "Por favor, corrija os erros no formulário.",
@@ -69,24 +81,32 @@ export const useProductForm = ({ initialProduct, onSave, onOpenChange }: UseProd
       return;
     }
 
-    const updatedProduct: Produto = {
-      ...initialProduct,
-      nome: sanitizeInput(formData.nome),
-      codigo: sanitizeInput(formData.codigo).toUpperCase(),
-      categoria: sanitizeInput(formData.categoria),
-      preco: parseFloat(formData.preco) || 0,
-      estoque: parseInt(formData.estoque) || 0,
-      imagem: formData.imagem,
-      unidade: formData.unidade,
-    };
-
-    onSave(updatedProduct);
-    onOpenChange(false);
+    if (initialProduct) {
+        const updatedProduct: Produto = {
+        ...initialProduct,
+        nome: sanitizeInput(formData.nome),
+        codigo: sanitizeInput(formData.codigo).toUpperCase(),
+        categoria: sanitizeInput(formData.categoria),
+        preco: parseFloat(formData.preco) || 0,
+        estoque: parseInt(formData.estoque) || 0,
+        imagem: formData.imagem,
+        unidade: formData.unidade,
+      };
+      onSave(updatedProduct);
+    } else {
+      const newProductData = {
+        nome: sanitizeInput(formData.nome),
+        codigo: sanitizeInput(formData.codigo).toUpperCase(),
+        categoria: sanitizeInput(formData.categoria),
+        preco: parseFloat(formData.preco) || 0,
+        estoque: parseInt(formData.estoque) || 0,
+        imagem: formData.imagem,
+      };
+      onSave(newProductData);
+    }
     
-    toast({
-      title: "Produto Atualizado",
-      description: `${formData.nome} foi atualizado com sucesso!`,
-    });
+    // The toast is now handled by react-query's onSuccess
+    // so no need to call it here.
   };
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {

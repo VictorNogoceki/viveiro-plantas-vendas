@@ -15,7 +15,7 @@ interface EditProductDialogProps {
 const EditProductDialog = ({ produto, open, onOpenChange, onSave }: EditProductDialogProps) => {
   const formLogic = useProductForm({
     initialProduct: produto,
-    onSave,
+    onSave: onSave as (p: Produto | Omit<Produto, 'id' | 'created_at'>) => void,
     onOpenChange,
   });
 
@@ -47,3 +47,4 @@ const EditProductDialog = ({ produto, open, onOpenChange, onSave }: EditProductD
 };
 
 export default EditProductDialog;
+

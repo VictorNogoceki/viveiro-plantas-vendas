@@ -1,20 +1,10 @@
-
 import React from 'react';
 import { ShoppingCart, User, Minus, Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-
-interface Produto {
-  id: number;
-  codigo: string;
-  nome: string;
-  categoria: string;
-  estoque: number;
-  preco: number;
-  imagem: string;
-}
+import { Produto } from '@/types/produto';
 
 interface ItemCarrinho {
   produto: Produto;
@@ -27,8 +17,8 @@ interface CarrinhoComprasProps {
   clienteSearch: string;
   setClienteSearch: (value: string) => void;
   produtoSelecionado: Produto | null;
-  atualizarQuantidade: (produtoId: number, novaQuantidade: number) => void;
-  removerDoCarrinho: (produtoId: number) => void;
+  atualizarQuantidade: (produtoId: string, novaQuantidade: number) => void;
+  removerDoCarrinho: (produtoId: string) => void;
   limparCarrinho: () => void;
   finalizarVenda: () => void;
   subtotal: number;
@@ -76,7 +66,7 @@ const CarrinhoCompras: React.FC<CarrinhoComprasProps> = ({
             </div>
             <div className="w-48 h-48 mx-auto mb-4 border-4 border-orange-500 rounded-lg overflow-hidden bg-white">
               <img 
-                src={produtoSelecionado.imagem} 
+                src={produtoSelecionado.imagem || '/placeholder.svg'} 
                 alt={produtoSelecionado.nome}
                 className="w-full h-full object-cover"
               />
