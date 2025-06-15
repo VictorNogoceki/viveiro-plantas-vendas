@@ -1,3 +1,4 @@
+
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -41,7 +42,6 @@ export const MovimentacaoEstoqueForm = ({ onSave, onClose, produto, produtos }: 
     resolver: zodResolver(StockMovementSchema),
     defaultValues: {
       produtoId: produto?.id.toString() || "",
-      tipoMovimentacao: "",
       quantidade: "",
       descricao: "",
     },
@@ -66,7 +66,7 @@ export const MovimentacaoEstoqueForm = ({ onSave, onClose, produto, produtos }: 
           render={({ field }) => (
             <FormItem>
               <FormLabel>* Produto</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value} disabled={!!produto}>
+              <Select onValueChange={field.onChange} value={field.value} disabled={!!produto}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione um produto" />
@@ -91,7 +91,7 @@ export const MovimentacaoEstoqueForm = ({ onSave, onClose, produto, produtos }: 
           render={({ field }) => (
             <FormItem>
               <FormLabel>* Tipo de Movimentação</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select onValueChange={field.onChange} value={field.value || ''}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione o tipo de movimentação" />
