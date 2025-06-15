@@ -1,14 +1,9 @@
+
 import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Printer } from 'lucide-react';
-import { Produto } from '@/types/produto';
-
-interface ItemCarrinho {
-  produto: Produto;
-  quantidade: number;
-  total: number;
-}
+import { ItemCarrinho } from '@/types/carrinho';
 
 interface ComprovanteVendaProps {
   isOpen: boolean;
