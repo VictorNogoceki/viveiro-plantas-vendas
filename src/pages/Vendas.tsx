@@ -5,8 +5,9 @@ import SelecaoProdutos from "@/components/SelecaoProdutos";
 import HeaderVendas from "@/components/HeaderVendas";
 import FinalizarVendaModal from "@/components/FinalizarVendaModal";
 import ComprovanteVenda from "@/components/ComprovanteVenda";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getProdutos } from "@/services/produtosService";
+import { createMovimentacao } from "@/services/movimentacaoEstoqueService";
 import { Produto } from "@/types/produto";
 
 interface ItemCarrinho {
@@ -16,6 +17,7 @@ interface ItemCarrinho {
 }
 
 const Vendas = () => {
+  const queryClient = useQueryClient();
   const { data: produtos = [], isLoading: isLoadingProdutos } = useQuery<Produto[]>({
     queryKey: ['produtos'],
     queryFn: getProdutos,
@@ -28,7 +30,7 @@ const Vendas = () => {
   const { toast } = useToast();
   const [isFinalizarModalOpen, setIsFinalizarModalOpen] = useState(false);
   const [isComprovanteOpen, setIsComprovanteOpen] = useState(false);
-  const [ultimaVenda, setUltimaVenda] = useState<{
+  const [ultimaVenda, setUltimaVenda: any] = useState<{
     carrinho: ItemCarrinho[];
     subtotal: number;
     formasPagamento: { nome: string; valor: number }[];
@@ -98,26 +100,56 @@ const Vendas = () => {
     setIsFinalizarModalOpen(true);
   };
 
-  const confirmarFinalizacao = (formasPagamento: { nome: string; valor: number }[]) => {
+  const confirmarFinalizacao = async (formasPagamento: { nome: string; valor: number }[]) => {
     const vendaId = `${Date.now().toString().slice(-6)}`;
-    
-    // Salva os dados da venda para o comprovante
-    setUltimaVenda({
-      carrinho: [...carrinho],
-      subtotal,
-      formasPagamento,
-      vendaId
-    });
 
-    toast({
-      title: "Venda Finalizada",
-      description: `Venda realizada com sucesso! Total: R$ ${subtotal.toFixed(2)}`,
-    });
-    
-    setCarrinho([]);
-    setClienteSearch("");
-    setIsFinalizarModalOpen(false);
-    setIsComprovanteOpen(true);
+    try {
+      // Usando Promise.all para enviar todas as solicitações de movimentação de estoque em paralelo.
+      // Se uma falhar, a promessa inteira é rejeitada.
+      // NOTA: Esta não é uma transação verdadeira. Se algumas movimentações tiverem sucesso antes que uma falhe,
+      // elas não serão revertidas automaticamente. Uma função de banco de dados (RPC) seria necessária
+      // para atomicidade completa.
+      const movimentacoesPromises = carrinho.map(item =>
+        createMovimentacao({
+          produtoId: item.produto.id,
+          tipo: 'saida',
+          quantidade: item.quantidade,
+          motivo: `Venda - ID ${vendaId}`,
+        })
+      );
+
+      await Promise.all(movimentacoesPromises);
+
+      // Se as atualizações de estoque forem bem-sucedidas, finalize a venda
+      setUltimaVenda({
+        carrinho: [...carrinho],
+        subtotal,
+        formasPagamento,
+        vendaId
+      });
+
+      toast({
+        title: "Venda Finalizada",
+        description: `Venda realizada com sucesso! Total: R$ ${subtotal.toFixed(2)}`,
+      });
+
+      // Invalida a query de produtos para buscar os dados atualizados de estoque
+      await queryClient.invalidateQueries({ queryKey: ['produtos'] });
+
+      // Reseta o estado
+      setCarrinho([]);
+      setClienteSearch("");
+      setIsFinalizarModalOpen(false);
+      setIsComprovanteOpen(true);
+
+    } catch (error: any) {
+      console.error("Erro ao finalizar venda:", error);
+      toast({
+        title: "Erro ao finalizar venda",
+        description: error.message || "Não foi possível atualizar o estoque.",
+        variant: "destructive",
+      });
+    }
   };
 
   const subtotal = carrinho.reduce((acc, item) => acc + item.total, 0);
