@@ -1,38 +1,54 @@
 
 import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { FileText, Plus, ChevronDown, ShoppingCart, FilePlus2, FileUp } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { getNotasFiscais, createNotaFiscalFromVenda } from "@/services/notasFiscaisService";
+import SelecionarVendaModal from "@/components/SelecionarVendaModal";
+import { NotaFiscal } from "@/types/notaFiscal";
 
 const NotasFiscais = () => {
-  const [notas, setNotas] = useState([
-    {
-      id: 1,
-      numero: "001",
-      cliente: "João Silva",
-      valor: 125.50,
-      data: "08/06/2025",
-      status: "Emitida"
-    }
-  ]);
-
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const { data: notas, isLoading, isError } = useQuery<NotaFiscal[]>({
+    queryKey: ['notasFiscais'],
+    queryFn: getNotasFiscais,
+  });
+
+  const { mutate: createNota, isPending: isCreatingNota } = useMutation({
+    mutationFn: createNotaFiscalFromVenda,
+    onSuccess: () => {
+      toast({ title: "Sucesso!", description: "Nota Fiscal criada com sucesso." });
+      queryClient.invalidateQueries({ queryKey: ['notasFiscais'] });
+      queryClient.invalidateQueries({ queryKey: ['vendas-sem-nota'] });
+      setIsModalOpen(false);
+    },
+    onError: (error) => {
+      toast({
+        title: "Erro",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
 
   const handleMenuClick = (feature: string) => {
-    toast({
-      title: "Em desenvolvimento",
-      description: `A funcionalidade de "${feature}" será implementada em breve.`,
-    });
+    if (feature === 'Criar a partir de uma Venda') {
+      setIsModalOpen(true);
+    } else {
+      toast({
+        title: "Em desenvolvimento",
+        description: `A funcionalidade de "${feature}" será implementada em breve.`,
+      });
+    }
   };
 
   return (
@@ -71,7 +87,7 @@ const NotasFiscais = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
-            Notas Fiscais Emitidas ({notas.length})
+            Notas Fiscais Emitidas ({notas?.length ?? 0})
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -86,7 +102,26 @@ const NotasFiscais = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {notas.map((nota) => (
+              {isLoading && Array.from({ length: 3 }).map((_, i) => (
+                <TableRow key={i}>
+                  <TableCell><Skeleton className="h-4 w-20" /></TableCell>
+                  <TableCell><Skeleton className="h-4 w-40" /></TableCell>
+                  <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+                  <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+                  <TableCell><Skeleton className="h-6 w-20 rounded-full" /></TableCell>
+                </TableRow>
+              ))}
+              {isError && (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center text-red-500">Erro ao carregar as notas fiscais.</TableCell>
+                </TableRow>
+              )}
+              {!isLoading && !isError && notas?.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center text-gray-500">Nenhuma nota fiscal emitida.</TableCell>
+                </TableRow>
+              )}
+              {notas?.map((nota) => (
                 <TableRow key={nota.id}>
                   <TableCell className="font-medium">#{nota.numero}</TableCell>
                   <TableCell>{nota.cliente}</TableCell>
@@ -103,6 +138,13 @@ const NotasFiscais = () => {
           </Table>
         </CardContent>
       </Card>
+
+      <SelecionarVendaModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSelectVenda={createNota}
+        isCreating={isCreatingNota}
+      />
     </div>
   );
 };
