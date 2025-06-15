@@ -88,9 +88,6 @@ const FluxoCaixa = () => {
             <span className="text-orange-500">Home</span> / Fluxo de Caixa
           </div>
         </div>
-        <div className="text-sm text-gray-500">
-          victor augusto
-        </div>
       </div>
 
       {/* Cards de Resumo */}

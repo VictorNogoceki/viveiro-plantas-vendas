@@ -11,7 +11,7 @@ const HeaderVendas: React.FC = () => {
       </div>
       <div className="flex items-center gap-2 text-gray-600">
         <User className="h-5 w-5" />
-        <span>victor augusto</span>
+        <span>Usuário</span>
       </div>
     </div>
   );
