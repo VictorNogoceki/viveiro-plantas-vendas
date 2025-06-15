@@ -66,6 +66,7 @@ const ComprovanteVenda: React.FC<ComprovanteVendaProps> = ({
           <div className="text-center space-y-1">
             <h3 className="font-bold text-lg">VIVEIRO EBENEZER</h3>
             <p>Av: Perimetral Presidente Tancredo de Almeida Neves, 100</p>
+            <p>CNPJ: 25.402.183/0001-00</p>
             <p>TEL: (44) 99926-0736</p>
           </div>
 
