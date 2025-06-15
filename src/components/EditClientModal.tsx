@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -89,6 +89,9 @@ const EditClientModal = ({ cliente, open, onOpenChange, onSave }: EditClientModa
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Editar Cliente</DialogTitle>
+          <DialogDescription>
+            Faça as alterações nos dados do cliente aqui. Clique em salvar quando terminar.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="grid grid-cols-1 gap-4 py-4">
