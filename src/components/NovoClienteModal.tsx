@@ -13,24 +13,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-
-interface ClienteData {
-  nome: string;
-  cpfCnpj: string;
-  endereco: string;
-  telefone: string;
-  email: string;
-  tipo: 'cpf' | 'cnpj';
-}
+import { NewCliente } from "@/services/clientesService";
 
 interface NovoClienteModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onClientAdded: (cliente: ClienteData) => void;
+  onClientAdded: (cliente: NewCliente) => void;
+  isAdding?: boolean;
 }
 
-const NovoClienteModal = ({ open, onOpenChange, onClientAdded }: NovoClienteModalProps) => {
-  const [formData, setFormData] = useState<ClienteData>({
+const NovoClienteModal = ({ open, onOpenChange, onClientAdded, isAdding }: NovoClienteModalProps) => {
+  const [formData, setFormData] = useState<NewCliente>({
     nome: '',
     cpfCnpj: '',
     endereco: '',
@@ -54,17 +47,25 @@ const NovoClienteModal = ({ open, onOpenChange, onClientAdded }: NovoClienteModa
     }
 
     onClientAdded(formData);
-    setFormData({
-      nome: '',
-      cpfCnpj: '',
-      endereco: '',
-      telefone: '',
-      email: '',
-      tipo: 'cpf'
-    });
-    onOpenChange(false);
+    // Não limpa o formulário aqui, espera o onSuccess da mutation
   };
   
+  // Limpa o formulário quando o modal é fechado ou um cliente é adicionado com sucesso.
+  // Como a lógica de fechar agora é controlada pela mutation, vamos observar o 'open'.
+  useState(() => {
+    if (!open) {
+      setFormData({
+        nome: '',
+        cpfCnpj: '',
+        endereco: '',
+        telefone: '',
+        email: '',
+        tipo: 'cpf'
+      });
+    }
+  });
+
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[625px]">
@@ -123,9 +124,11 @@ const NovoClienteModal = ({ open, onOpenChange, onClientAdded }: NovoClienteModa
           </div>
           <DialogFooter>
             <DialogClose asChild>
-                <Button type="button" variant="outline">Cancelar</Button>
+                <Button type="button" variant="outline" disabled={isAdding}>Cancelar</Button>
             </DialogClose>
-            <Button type="submit">Salvar Cliente</Button>
+            <Button type="submit" disabled={isAdding}>
+              {isAdding ? 'Salvando...' : 'Salvar Cliente'}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

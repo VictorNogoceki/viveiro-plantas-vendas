@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -7,28 +6,21 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { Cliente } from "@/services/clientesService";
 
-interface Cliente {
-  id: number;
-  nome: string;
-  cpfCnpj: string;
-  endereco: string;
-  telefone: string;
-  email: string;
-  tipo: 'cpf' | 'cnpj';
-}
 
 interface EditClientModalProps {
   cliente: Cliente | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSave: (cliente: Cliente) => void;
+  isSaving?: boolean;
 }
 
-const EditClientModal = ({ cliente, open, onOpenChange, onSave }: EditClientModalProps) => {
+const EditClientModal = ({ cliente, open, onOpenChange, onSave, isSaving }: EditClientModalProps) => {
   const [formData, setFormData] = useState({
     nome: '',
-    cpf: '',
+    cpfCnpj: '',
     telefone: '',
     email: '',
     cep: '',
@@ -43,10 +35,10 @@ const EditClientModal = ({ cliente, open, onOpenChange, onSave }: EditClientModa
     if (cliente) {
       setFormData({
         nome: cliente.nome,
-        cpf: cliente.cpfCnpj,
+        cpfCnpj: cliente.cpfCnpj,
         telefone: cliente.telefone,
         email: cliente.email,
-        cep: '',
+        cep: '', // Estes campos não estão no DB
         cidade: '',
         uf: '',
         endereco: cliente.endereco
@@ -57,7 +49,7 @@ const EditClientModal = ({ cliente, open, onOpenChange, onSave }: EditClientModa
   const handleSave = () => {
     if (!cliente) return;
 
-    if (!formData.nome || !formData.cpf || !formData.telefone) {
+    if (!formData.nome || !formData.cpfCnpj || !formData.telefone) {
       toast({
         title: "Erro",
         description: "Por favor, preencha os campos obrigatórios.",
@@ -69,19 +61,14 @@ const EditClientModal = ({ cliente, open, onOpenChange, onSave }: EditClientModa
     const updatedClient: Cliente = {
       ...cliente,
       nome: formData.nome,
-      cpfCnpj: formData.cpf,
+      cpfCnpj: formData.cpfCnpj,
       telefone: formData.telefone,
       email: formData.email,
-      endereco: formData.endereco
+      endereco: formData.endereco,
+      // O 'tipo' não é editável neste formulário, então mantém o original
     };
 
     onSave(updatedClient);
-    onOpenChange(false);
-    
-    toast({
-      title: "Cliente Atualizado",
-      description: `${formData.nome} foi atualizado com sucesso!`,
-    });
   };
 
   return (
@@ -109,13 +96,13 @@ const EditClientModal = ({ cliente, open, onOpenChange, onSave }: EditClientModa
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="cpf" className="text-sm font-medium">
-                <span className="text-red-500">*</span> CPF
+              <Label htmlFor="cpfCnpj" className="text-sm font-medium">
+                <span className="text-red-500">*</span> CPF/CNPJ
               </Label>
               <Input
-                id="cpf"
-                value={formData.cpf}
-                onChange={(e) => setFormData(prev => ({ ...prev, cpf: e.target.value }))}
+                id="cpfCnpj"
+                value={formData.cpfCnpj}
+                onChange={(e) => setFormData(prev => ({ ...prev, cpfCnpj: e.target.value }))}
                 placeholder="Ex: 123.456.789-00"
               />
             </div>
@@ -226,14 +213,15 @@ const EditClientModal = ({ cliente, open, onOpenChange, onSave }: EditClientModa
         </div>
 
         <div className="flex justify-end gap-2 pt-4">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isSaving}>
             Cancelar
           </Button>
           <Button 
             onClick={handleSave}
             className="bg-orange-500 hover:bg-orange-600 text-white"
+            disabled={isSaving}
           >
-            Salvar
+            {isSaving ? 'Salvando...' : 'Salvar'}
           </Button>
         </div>
       </DialogContent>
