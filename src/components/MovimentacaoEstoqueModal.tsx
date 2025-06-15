@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -9,22 +8,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { StockMovementSchema, sanitizeInput } from "@/lib/validation";
 import { logSecurityEvent } from "@/lib/security";
 import { useToast } from "@/hooks/use-toast";
-
-interface EstoqueItem {
-  id: number;
-  codigo: string;
-  nome: string;
-  categoria: string;
-  estoque: number;
-  unidade: string;
-  status: "normal" | "baixo";
-}
+import { Produto } from "@/types/produto";
 
 interface MovimentacaoEstoqueModalProps {
   isOpen: boolean;
   onClose: () => void;
-  produto?: EstoqueItem;
-  produtos: EstoqueItem[];
+  produto?: Produto;
+  produtos: Produto[];
   onSave: (movimentacao: {
     produtoId: string;
     tipo: string;

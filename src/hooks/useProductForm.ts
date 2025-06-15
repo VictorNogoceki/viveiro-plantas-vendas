@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { ProductSchema, sanitizeInput, validateImageFile } from "@/lib/validation";
@@ -18,7 +17,7 @@ export const useProductForm = ({ initialProduct, onSave, onOpenChange }: UseProd
     descricao: "",
     preco: initialProduct?.preco?.toString() || "",
     estoque: initialProduct?.estoque?.toString() || "",
-    unidade: "UN",
+    unidade: initialProduct?.unidade || "UN",
     categoria: initialProduct?.categoria || "",
     ativo: true,
     imagem: initialProduct?.imagem || ""
@@ -35,7 +34,7 @@ export const useProductForm = ({ initialProduct, onSave, onOpenChange }: UseProd
         descricao: "",
         preco: initialProduct.preco.toString(),
         estoque: initialProduct.estoque.toString(),
-        unidade: "UN",
+        unidade: initialProduct.unidade || "UN",
         categoria: initialProduct.categoria,
         ativo: true,
         imagem: initialProduct.imagem,
@@ -78,6 +77,7 @@ export const useProductForm = ({ initialProduct, onSave, onOpenChange }: UseProd
       preco: parseFloat(formData.preco) || 0,
       estoque: parseInt(formData.estoque) || 0,
       imagem: formData.imagem,
+      unidade: formData.unidade,
     };
 
     onSave(updatedProduct);

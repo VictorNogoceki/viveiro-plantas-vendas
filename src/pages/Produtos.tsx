@@ -11,46 +11,12 @@ import { Link } from "react-router-dom";
 import EditProductDialog from "@/components/EditProductDialog";
 import NovoProductDialog from "@/components/NovoProductDialog";
 import { Produto } from "@/types/produto";
+import { useProductStore } from "@/store/products";
 
 const Produtos = () => {
-  const [produtos, setProdutos] = useState<Produto[]>([
-    {
-      id: 1,
-      codigo: "PLT001",
-      nome: "ROSA VERMELHA",
-      categoria: "Flores",
-      estoque: 25,
-      preco: 15.90,
-      imagem: "/lovable-uploads/f3ca6925-b6cb-459b-9eaa-422549153b2b.png"
-    },
-    {
-      id: 2,
-      codigo: "PLT002", 
-      nome: "SAMAMBAIA",
-      categoria: "Folhagem",
-      estoque: 8,
-      preco: 25.00,
-      imagem: "/lovable-uploads/4b16ca18-e502-4020-96ef-096f7dbea63d.png"
-    },
-    {
-      id: 3,
-      codigo: "PLT003",
-      nome: "SUCULENTA ECHEVERIA",
-      categoria: "Suculentas",
-      estoque: 45,
-      preco: 12.50,
-      imagem: "/lovable-uploads/76b52c52-e6fb-4664-beb4-5dfa62c8869d.png"
-    },
-    {
-      id: 4,
-      codigo: "PLT004",
-      nome: "ORQUÍDEA PHALAENOPSIS",
-      categoria: "Flores",
-      estoque: 5,
-      preco: 85.00,
-      imagem: "/lovable-uploads/56fd79a4-cedc-4c8d-a9fe-624dffa1d655.png"
-    }
-  ]);
+  const produtos = useProductStore((state) => state.produtos);
+  const updateProduct = useProductStore((state) => state.updateProduct);
+  const createProduct = useProductStore((state) => state.createProduct);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedProduct, setSelectedProduct] = useState<Produto | null>(null);
@@ -70,23 +36,14 @@ const Produtos = () => {
   };
 
   const handleSaveProduct = (updatedProduct: Produto) => {
-    setProdutos(prev => 
-      prev.map(produto => 
-        produto.id === updatedProduct.id ? updatedProduct : produto
-      )
-    );
+    updateProduct(updatedProduct);
   };
 
-  const handleCreateProduct = (newProductData: Omit<Produto, "id" | "imagem"> & { imagem?: string | undefined }) => {
-    const newProduct: Produto = {
-      ...newProductData,
-      id: Math.max(...produtos.map(p => p.id), 0) + 1,
-      imagem: newProductData.imagem || "/placeholder.svg",
-    };
-    setProdutos(prev => [...prev, newProduct]);
+  const handleCreateProduct = (newProductData: Omit<Produto, "id" | "unidade" | "imagem"> & { imagem?: string | undefined }) => {
+    createProduct(newProductData);
     toast({
       title: "Produto Adicionado!",
-      description: `${newProduct.nome} foi cadastrado com sucesso.`,
+      description: `${newProductData.nome} foi cadastrado com sucesso.`,
     });
   };
 

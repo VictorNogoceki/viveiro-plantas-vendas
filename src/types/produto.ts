@@ -7,4 +7,5 @@ export interface Produto {
   estoque: number;
   preco: number;
   imagem: string;
+  unidade: string;
 }

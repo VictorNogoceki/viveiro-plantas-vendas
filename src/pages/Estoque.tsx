@@ -11,16 +11,8 @@ import { Pagination, PaginationContent, PaginationItem, PaginationLink, Paginati
 import { Link } from "react-router-dom";
 import MovimentacaoEstoqueModal from "@/components/MovimentacaoEstoqueModal";
 import { useToast } from "@/hooks/use-toast";
-
-interface EstoqueItem {
-  id: number;
-  codigo: string;
-  nome: string;
-  categoria: string;
-  estoque: number;
-  unidade: string;
-  status: "normal" | "baixo";
-}
+import { useProductStore } from "@/store/products";
+import { Produto } from "@/types/produto";
 
 interface MovimentacaoItem {
   id: number;
@@ -35,49 +27,13 @@ interface MovimentacaoItem {
 const Estoque = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [produtoSelecionado, setProdutoSelecionado] = useState<EstoqueItem | undefined>();
+  const [produtoSelecionado, setProdutoSelecionado] = useState<Produto | undefined>();
   const [activeTab, setActiveTab] = useState("produtos");
   const [historyFilter, setHistoryFilter] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const [estoqueItems, setEstoqueItems] = useState<EstoqueItem[]>([
-    {
-      id: 1,
-      codigo: "PLT001",
-      nome: "ROSA VERMELHA",
-      categoria: "Flores",
-      estoque: 25,
-      unidade: "UN",
-      status: "normal"
-    },
-    {
-      id: 2,
-      codigo: "PLT002",
-      nome: "SAMAMBAIA",
-      categoria: "Folhagem",
-      estoque: 8,
-      unidade: "UN",
-      status: "baixo"
-    },
-    {
-      id: 3,
-      codigo: "PLT003",
-      nome: "SUCULENTA ECHEVERIA",
-      categoria: "Suculentas",
-      estoque: 45,
-      unidade: "UN",
-      status: "normal"
-    },
-    {
-      id: 4,
-      codigo: "PLT004",
-      nome: "ORQUÍDEA PHALAENOPSIS",
-      categoria: "Flores",
-      estoque: 5,
-      unidade: "UN",
-      status: "baixo"
-    }
-  ]);
+  const estoqueItems = useProductStore((state) => state.produtos);
+  const updateStock = useProductStore((state) => state.updateStock);
 
   const [movimentacoes, setMovimentacoes] = useState<MovimentacaoItem[]>([
     {
@@ -110,7 +66,7 @@ const Estoque = () => {
     ? movimentacoes.filter(mov => mov.produto.toLowerCase() === historyFilter.toLowerCase())
     : movimentacoes;
 
-  const handleNovaMovimentacao = (produto?: EstoqueItem) => {
+  const handleNovaMovimentacao = (produto?: Produto) => {
     setProdutoSelecionado(produto);
     setIsModalOpen(true);
   };
@@ -128,25 +84,18 @@ const Estoque = () => {
   const handleSaveMovimentacao = (movimentacao: { produtoId: string; tipo: string; quantidade: number; descricao: string; }) => {
     const { produtoId, tipo, quantidade, descricao } = movimentacao;
 
-    let produtoNome = "";
+    const produto = estoqueItems.find(item => item.id.toString() === produtoId);
+    if (!produto) return;
 
-    setEstoqueItems(prevItems =>
-      prevItems.map(item => {
-        if (item.id.toString() === produtoId) {
-          produtoNome = item.nome;
-          const newStock = tipo === 'entrada' ? item.estoque + quantidade : item.estoque - quantidade;
-          return { ...item, estoque: newStock, status: newStock < 10 ? 'baixo' : 'normal' };
-        }
-        return item;
-      })
-    );
+    const newStock = tipo === 'entrada' ? produto.estoque + quantidade : produto.estoque - quantidade;
+    updateStock(produto.id, newStock);
 
-    if (produtoNome) {
+    if (produto.nome) {
       const novaMovimentacao: MovimentacaoItem = {
         id: movimentacoes.length + 1,
         data: new Date().toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' }),
         tipo: tipo as "entrada" | "saida",
-        produto: produtoNome,
+        produto: produto.nome,
         quantidade: quantidade,
         usuario: "Admin", // Assuming 'Admin' for now
         observacao: descricao
