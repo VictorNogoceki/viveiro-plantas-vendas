@@ -23,17 +23,6 @@ export const useVendas = (produtos: Produto[] = []) => {
     vendaId: string;
   } | null>(null);
   
-  // Força limpeza completa sempre que o hook é inicializado
-  useEffect(() => {
-    console.log("useVendas: Iniciando com carrinho vazio");
-    setCarrinho([]);
-    setClienteSearch("");
-    setProdutoSearch("");
-    setIsComprovanteOpen(false);
-    setIsFinalizarModalOpen(false);
-    setUltimaVenda(null);
-  }, []);
-
   useEffect(() => {
     if (!produtoSelecionado && produtos.length > 0) {
       setProdutoSelecionado(produtos[0]);
@@ -83,7 +72,6 @@ export const useVendas = (produtos: Produto[] = []) => {
   };
 
   const limparCarrinho = () => {
-    console.log("useVendas: Limpando carrinho manualmente");
     setCarrinho([]);
   };
 
@@ -129,16 +117,10 @@ export const useVendas = (produtos: Produto[] = []) => {
 
       await queryClient.invalidateQueries({ queryKey: ['produtos'] });
 
-      // Limpar estados após finalização
       setCarrinho([]);
       setClienteSearch("");
       setIsFinalizarModalOpen(false);
-      
-      // Aguardar antes de abrir o comprovante para evitar conflitos
-      setTimeout(() => {
-        console.log("Abrindo comprovante após finalização");
-        setIsComprovanteOpen(true);
-      }, 100);
+      setIsComprovanteOpen(true);
 
     } catch (error: any) {
       console.error("Erro ao finalizar venda:", error);
