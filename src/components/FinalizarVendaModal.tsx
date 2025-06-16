@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -129,7 +128,6 @@ const FinalizarVendaModal: React.FC<FinalizarVendaModalProps> = ({
       .map(forma => ({ nome: forma.nome, valor: forma.valor }));
     
     onConfirm(formasSelecionadas);
-    onClose();
   };
 
   return (
@@ -159,7 +157,7 @@ const FinalizarVendaModal: React.FC<FinalizarVendaModalProps> = ({
             onValorBlur={handleValorBlur}
           />
 
-          <div className="flex gap-2 print:hidden">
+          <div className="flex gap-2">
             <Button variant="outline" onClick={onClose} className="flex-1">
               Cancelar
             </Button>
