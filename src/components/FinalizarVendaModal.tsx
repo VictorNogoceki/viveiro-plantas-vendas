@@ -1,9 +1,9 @@
+
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Checkbox } from '@/components/ui/checkbox';
-import { X } from 'lucide-react';
+import PaymentSummary from '@/components/vendas/PaymentSummary';
+import PaymentMethodSelector from '@/components/vendas/PaymentMethodSelector';
 
 interface FormaPagamento {
   id: string;
@@ -11,7 +11,7 @@ interface FormaPagamento {
   selecionada: boolean;
   valor: number;
   valorTexto: string;
-  editando: boolean; // Campo para controlar se está sendo editado
+  editando: boolean;
 }
 
 interface FinalizarVendaModalProps {
@@ -135,11 +135,8 @@ const FinalizarVendaModal: React.FC<FinalizarVendaModalProps> = ({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-md">
-        <DialogHeader className="flex flex-row items-center justify-between">
+        <DialogHeader>
           <DialogTitle>Finalizar Venda</DialogTitle>
-          <Button variant="ghost" size="sm" onClick={onClose}>
-            <X className="h-4 w-4" />
-          </Button>
         </DialogHeader>
         
         <div className="space-y-6">
@@ -148,55 +145,19 @@ const FinalizarVendaModal: React.FC<FinalizarVendaModalProps> = ({
             <div className="text-3xl font-bold">R$ {subtotal.toFixed(2)}</div>
           </div>
 
-          <div className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span>Total da Venda:</span>
-              <span>R$ {subtotal.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Total Informado:</span>
-              <span>R$ {totalInformado.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Faltam:</span>
-              <span>R$ {faltam.toFixed(2)}</span>
-            </div>
-          </div>
+          <PaymentSummary 
+            subtotal={subtotal}
+            totalInformado={totalInformado}
+            faltam={faltam}
+          />
 
-          <div className="bg-yellow-50 p-3 rounded">
-            <p className="text-sm text-gray-700 mb-3">
-              Selecione as formas de pagamento e os valores correspondentes:
-            </p>
-            
-            <div className="space-y-3">
-              {formasPagamento.map((forma) => (
-                <div key={forma.id} className="flex items-center gap-3">
-                  <Checkbox
-                    id={forma.id}
-                    checked={forma.selecionada}
-                    onCheckedChange={(checked) => 
-                      handleCheckboxChange(forma.id, checked as boolean)
-                    }
-                  />
-                  <label htmlFor={forma.id} className="flex-1 text-sm">
-                    {forma.nome}
-                  </label>
-                  <Input
-                    type="text"
-                    value={forma.selecionada ? forma.valorTexto : '0.00'}
-                    onChange={(e) => handleValorChange(forma.id, e.target.value)}
-                    onFocus={(e) => {
-                      handleValorFocus(forma.id);
-                      e.target.select();
-                    }}
-                    onBlur={() => handleValorBlur(forma.id)}
-                    disabled={!forma.selecionada}
-                    className="w-24 text-right"
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
+          <PaymentMethodSelector
+            formasPagamento={formasPagamento}
+            onCheckboxChange={handleCheckboxChange}
+            onValorChange={handleValorChange}
+            onValorFocus={handleValorFocus}
+            onValorBlur={handleValorBlur}
+          />
 
           <div className="flex gap-2 print:hidden">
             <Button variant="outline" onClick={onClose} className="flex-1">
