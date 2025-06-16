@@ -23,11 +23,12 @@ export const useVendas = (produtos: Produto[] = []) => {
     vendaId: string;
   } | null>(null);
   
-  // Força limpeza do carrinho sempre que o hook é inicializado
+  // Força limpeza completa sempre que o hook é inicializado
   useEffect(() => {
-    console.log("useVendas: Limpando carrinho na inicialização");
+    console.log("useVendas: Iniciando com carrinho vazio");
     setCarrinho([]);
     setClienteSearch("");
+    setProdutoSearch("");
     setIsComprovanteOpen(false);
     setIsFinalizarModalOpen(false);
     setUltimaVenda(null);
@@ -133,11 +134,11 @@ export const useVendas = (produtos: Produto[] = []) => {
       setClienteSearch("");
       setIsFinalizarModalOpen(false);
       
-      // Aguardar antes de abrir o comprovante
+      // Aguardar antes de abrir o comprovante para evitar conflitos
       setTimeout(() => {
         console.log("Abrindo comprovante após finalização");
         setIsComprovanteOpen(true);
-      }, 500);
+      }, 100);
 
     } catch (error: any) {
       console.error("Erro ao finalizar venda:", error);

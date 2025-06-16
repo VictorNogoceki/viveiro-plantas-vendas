@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -132,7 +133,7 @@ const FinalizarVendaModal: React.FC<FinalizarVendaModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-md [&>button]:hidden">
         <DialogHeader>
           <DialogTitle>Finalizar Venda</DialogTitle>
         </DialogHeader>
