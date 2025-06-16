@@ -23,6 +23,12 @@ export const useVendas = (produtos: Produto[] = []) => {
     vendaId: string;
   } | null>(null);
   
+  // Limpar carrinho ao entrar na página de vendas
+  useEffect(() => {
+    setCarrinho([]);
+    setClienteSearch("");
+  }, []);
+
   useEffect(() => {
     if (!produtoSelecionado && produtos.length > 0) {
       setProdutoSelecionado(produtos[0]);
@@ -120,7 +126,11 @@ export const useVendas = (produtos: Produto[] = []) => {
       setCarrinho([]);
       setClienteSearch("");
       setIsFinalizarModalOpen(false);
-      setIsComprovanteOpen(true);
+      
+      // Pequeno delay para garantir que o modal anterior feche antes de abrir o comprovante
+      setTimeout(() => {
+        setIsComprovanteOpen(true);
+      }, 300);
 
     } catch (error: any) {
       console.error("Erro ao finalizar venda:", error);

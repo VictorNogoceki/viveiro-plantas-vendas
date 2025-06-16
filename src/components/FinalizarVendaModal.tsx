@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -199,7 +198,7 @@ const FinalizarVendaModal: React.FC<FinalizarVendaModalProps> = ({
             </div>
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex gap-2 print:hidden">
             <Button variant="outline" onClick={onClose} className="flex-1">
               Cancelar
             </Button>

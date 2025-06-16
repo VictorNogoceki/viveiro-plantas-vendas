@@ -33,15 +33,10 @@ const ComprovanteVenda: React.FC<ComprovanteVendaProps> = ({
     window.print();
   };
 
-  const handleBaixar = () => {
-    // Aqui você pode implementar a lógica para download do comprovante
-    console.log('Baixar comprovante');
-  };
-
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
+      <DialogContent className="max-w-md print:shadow-none print:border-none">
+        <DialogHeader className="print:hidden">
           <DialogTitle>Comprovante de Venda</DialogTitle>
         </DialogHeader>
         
@@ -109,8 +104,8 @@ const ComprovanteVenda: React.FC<ComprovanteVendaProps> = ({
             <p className="font-medium">Obrigado pela preferência!</p>
           </div>
 
-          {/* Botões de ação */}
-          <div className="flex gap-2 pt-4">
+          {/* Botões de ação - ocultos na impressão */}
+          <div className="flex gap-2 pt-4 print:hidden">
             <Button 
               onClick={handleImprimir}
               className="flex-1 bg-orange-500 hover:bg-orange-600"

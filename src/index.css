@@ -101,3 +101,37 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Estilos específicos para impressão */
+@media print {
+  /* Oculta elementos que não devem aparecer na impressão */
+  .print\:hidden {
+    display: none !important;
+  }
+  
+  /* Remove sombra e bordas dos dialogs na impressão */
+  .print\:shadow-none {
+    box-shadow: none !important;
+  }
+  
+  .print\:border-none {
+    border: none !important;
+  }
+  
+  /* Ajusta o layout para impressão */
+  body {
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Remove bordas e sombras desnecessárias */
+  * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+  
+  /* Força cores escuras para texto na impressão */
+  h1, h2, h3, h4, h5, h6, p, span, div {
+    color: black !important;
+  }
+}
