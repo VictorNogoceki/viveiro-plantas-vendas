@@ -101,3 +101,66 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Estilos específicos para impressão */
+@media print {
+  /* Oculta tudo por padrão */
+  * {
+    visibility: hidden;
+  }
+  
+  /* Mostra apenas o conteúdo do comprovante */
+  .print-area, .print-area * {
+    visibility: visible;
+  }
+  
+  /* Oculta elementos que não devem aparecer na impressão */
+  .no-print {
+    display: none !important;
+  }
+  
+  /* Remove overlay e posicionamento fixo do modal */
+  [data-radix-dialog-overlay] {
+    display: none !important;
+  }
+  
+  /* Garante que o conteúdo do comprovante ocupe toda a página */
+  .print-content {
+    position: static !important;
+    transform: none !important;
+    max-width: none !important;
+    width: 100% !important;
+    height: auto !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: white !important;
+    margin: 0 !important;
+    padding: 20px !important;
+  }
+  
+  /* Remove botões do fechamento do diálogo */
+  [data-radix-dialog-close] {
+    display: none !important;
+  }
+  
+  /* Garante que o conteúdo da impressão seja visível */
+  .print-area {
+    position: static !important;
+    background: white !important;
+    color: black !important;
+    font-size: 12pt !important;
+    line-height: 1.2 !important;
+  }
+  
+  /* Remove espaçamentos desnecessários */
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  /* Garante quebras de linha adequadas */
+  hr {
+    border: 1px solid #000 !important;
+    margin: 8px 0 !important;
+  }
+}

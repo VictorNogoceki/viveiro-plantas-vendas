@@ -40,12 +40,12 @@ const ComprovanteVenda: React.FC<ComprovanteVendaProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
+      <DialogContent className="max-w-md print-content">
+        <DialogHeader className="no-print">
           <DialogTitle>Comprovante de Venda</DialogTitle>
         </DialogHeader>
         
-        <div className="space-y-4 text-sm">
+        <div className="space-y-4 text-sm print-area">
           {/* Cabeçalho da empresa */}
           <div className="text-center space-y-1">
             <h3 className="font-bold text-lg">VIVEIRO EBENEZER</h3>
@@ -110,7 +110,7 @@ const ComprovanteVenda: React.FC<ComprovanteVendaProps> = ({
           </div>
 
           {/* Botões de ação */}
-          <div className="flex gap-2 pt-4">
+          <div className="flex gap-2 pt-4 no-print">
             <Button 
               onClick={handleImprimir}
               className="flex-1 bg-orange-500 hover:bg-orange-600"
