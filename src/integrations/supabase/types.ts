@@ -232,6 +232,65 @@ export type Database = {
         }
         Relationships: []
       }
+      usuario_permissoes: {
+        Row: {
+          created_at: string
+          id: string
+          permissao: Database["public"]["Enums"]["tipo_permissao"]
+          usuario_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          permissao: Database["public"]["Enums"]["tipo_permissao"]
+          usuario_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          permissao?: Database["public"]["Enums"]["tipo_permissao"]
+          usuario_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "usuario_permissoes_usuario_id_fkey"
+            columns: ["usuario_id"]
+            isOneToOne: false
+            referencedRelation: "usuarios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      usuarios: {
+        Row: {
+          ativo: boolean
+          created_at: string
+          data_criacao: string
+          email: string
+          id: string
+          nome: string
+          telefone: string | null
+        }
+        Insert: {
+          ativo?: boolean
+          created_at?: string
+          data_criacao?: string
+          email: string
+          id?: string
+          nome: string
+          telefone?: string | null
+        }
+        Update: {
+          ativo?: boolean
+          created_at?: string
+          data_criacao?: string
+          email?: string
+          id?: string
+          nome?: string
+          telefone?: string | null
+        }
+        Relationships: []
+      }
       vendas: {
         Row: {
           cliente_id: string | null
@@ -275,7 +334,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      tipo_permissao: "usuario" | "administrador" | "gerente"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -390,6 +449,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      tipo_permissao: ["usuario", "administrador", "gerente"],
+    },
   },
 } as const
