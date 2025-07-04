@@ -1,3 +1,4 @@
+
 import { Calendar, ClipboardList, Home, Package, Warehouse, Users, ShoppingCart, FileText, BarChart3, DollarSign } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import {
@@ -48,9 +49,9 @@ const menuItems = [
     icon: DollarSign,
   },
   {
-    title: "Notas Fiscais",
-    url: "/notas-fiscais",
-    icon: FileText,
+    title: "Usuários",
+    url: "/usuarios",
+    icon: Users,
   },
   {
     title: "Relatórios",
