@@ -12,6 +12,9 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import type { Database } from "@/integrations/supabase/types";
+
+type TipoPermissao = Database["public"]["Enums"]["tipo_permissao"];
 
 interface NovoUsuarioModalProps {
   isOpen: boolean;
@@ -24,7 +27,7 @@ export const NovoUsuarioModal = ({ isOpen, onClose, onUsuarioSalvo }: NovoUsuari
     nome: "",
     email: "",
     telefone: "",
-    permissoes: [] as string[],
+    permissoes: [] as TipoPermissao[],
   });
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
@@ -51,7 +54,7 @@ export const NovoUsuarioModal = ({ isOpen, onClose, onUsuarioSalvo }: NovoUsuari
       if (formData.permissoes.length > 0) {
         const permissoesData = formData.permissoes.map(permissao => ({
           usuario_id: usuario.id,
-          permissao: permissao,
+          permissao: permissao as TipoPermissao,
         }));
 
         const { error: permissoesError } = await supabase
@@ -86,7 +89,7 @@ export const NovoUsuarioModal = ({ isOpen, onClose, onUsuarioSalvo }: NovoUsuari
     }
   };
 
-  const handlePermissaoChange = (permissao: string, checked: boolean) => {
+  const handlePermissaoChange = (permissao: TipoPermissao, checked: boolean) => {
     if (checked) {
       setFormData(prev => ({
         ...prev,
