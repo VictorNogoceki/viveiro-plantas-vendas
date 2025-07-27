@@ -1,4 +1,5 @@
 
+import { useEffect } from "react";
 import CarrinhoCompras from "@/components/CarrinhoCompras";
 import SelecaoProdutos from "@/components/SelecaoProdutos";
 import HeaderVendas from "@/components/HeaderVendas";
@@ -37,6 +38,10 @@ const Vendas = () => {
     subtotal,
     totalItens,
   } = useVendas(produtos);
+
+  useEffect(() => {
+    limparCarrinho();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50">
