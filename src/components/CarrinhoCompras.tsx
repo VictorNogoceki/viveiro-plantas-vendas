@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Produto } from '@/types/produto';
 import { ItemCarrinho } from '@/types/carrinho';
+import { formatCurrency } from '@/lib/utils';
 
 interface CarrinhoComprasProps {
   carrinho: ItemCarrinho[];
@@ -58,7 +59,7 @@ const CarrinhoCompras: React.FC<CarrinhoComprasProps> = ({
           <div className="text-center py-8">
             <h3 className="text-lg font-bold mb-2">{produtoSelecionado.nome}</h3>
             <div className="text-2xl font-bold text-orange-500 mb-4">
-              R$ {produtoSelecionado.preco.toFixed(2)}
+              {formatCurrency(produtoSelecionado.preco)}
             </div>
             <div className="w-48 h-48 mx-auto mb-4 border-4 border-orange-500 rounded-lg overflow-hidden bg-white">
               <img 
@@ -114,8 +115,8 @@ const CarrinhoCompras: React.FC<CarrinhoComprasProps> = ({
                         </Button>
                       </div>
                     </TableCell>
-                    <TableCell>R$ {item.produto.preco.toFixed(2)}</TableCell>
-                    <TableCell>R$ {item.total.toFixed(2)}</TableCell>
+                    <TableCell>{formatCurrency(item.produto.preco)}</TableCell>
+                    <TableCell>{formatCurrency(item.total)}</TableCell>
                     <TableCell>
                       <Button
                         size="sm"
@@ -140,18 +141,20 @@ const CarrinhoCompras: React.FC<CarrinhoComprasProps> = ({
 
         {/* Subtotal */}
         <div className="text-right text-sm">
-          Subtotal: <span className="font-bold">R$ {subtotal.toFixed(2)}</span>
+          Subtotal: <span className="font-bold">{formatCurrency(subtotal)}</span>
         </div>
 
         {/* Botões */}
         <div className="flex gap-2">
-          <Button 
-            variant="outline" 
-            className="flex-1"
-            onClick={limparCarrinho}
-          >
-            Limpar Carrinho
-          </Button>
+          {carrinho.length > 0 && (
+            <Button 
+              variant="outline" 
+              className="flex-1"
+              onClick={limparCarrinho}
+            >
+              Limpar Carrinho
+            </Button>
+          )}
           <Button 
             className="flex-1 bg-orange-500 hover:bg-orange-600"
             onClick={finalizarVenda}
@@ -166,7 +169,7 @@ const CarrinhoCompras: React.FC<CarrinhoComprasProps> = ({
             Total
           </div>
           <div className="text-3xl font-bold text-gray-900">
-            R$ {subtotal.toFixed(2)}
+            {formatCurrency(subtotal)}
           </div>
         </div>
       </CardContent>

@@ -5,6 +5,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { createMovimentacao } from "@/services/movimentacaoEstoqueService";
 import { Produto } from "@/types/produto";
 import { ItemCarrinho } from "@/types/carrinho";
+import { formatCurrency } from "@/lib/utils";
 
 export const useVendas = (produtos: Produto[] = []) => {
   const queryClient = useQueryClient();
@@ -112,7 +113,7 @@ export const useVendas = (produtos: Produto[] = []) => {
 
       toast({
         title: "Venda Finalizada",
-        description: `Venda realizada com sucesso! Total: R$ ${subtotal.toFixed(2)}`,
+        description: `Venda realizada com sucesso! Total: ${formatCurrency(subtotal)}`,
       });
 
       await queryClient.invalidateQueries({ queryKey: ['produtos'] });

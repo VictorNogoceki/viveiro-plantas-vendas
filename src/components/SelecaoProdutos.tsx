@@ -7,6 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Produto } from '@/types/produto';
 import { Skeleton } from './ui/skeleton';
+import { formatCurrency } from '@/lib/utils';
 
 interface SelecaoProdutosProps {
   produtos: Produto[];
@@ -102,7 +103,7 @@ const SelecaoProdutos: React.FC<SelecaoProdutosProps> = ({
                       <TableCell className="font-mono text-sm">{produto.codigo}</TableCell>
                       <TableCell className="font-medium">{produto.nome}</TableCell>
                       <TableCell className="text-right font-bold">
-                        R$ {produto.preco.toFixed(2)}
+                        {formatCurrency(produto.preco)}
                       </TableCell>
                       <TableCell>
                         <Button

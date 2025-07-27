@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { X } from 'lucide-react';
+import { formatCurrency } from '@/lib/utils';
 
 interface FormaPagamento {
   id: string;
@@ -146,21 +147,21 @@ const FinalizarVendaModal: React.FC<FinalizarVendaModalProps> = ({
         <div className="space-y-6">
           <div className="text-center">
             <h3 className="text-lg font-medium mb-2">Total da Venda</h3>
-            <div className="text-3xl font-bold">R$ {subtotal.toFixed(2)}</div>
+            <div className="text-3xl font-bold">{formatCurrency(subtotal)}</div>
           </div>
 
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
               <span>Total da Venda:</span>
-              <span>R$ {subtotal.toFixed(2)}</span>
+              <span>{formatCurrency(subtotal)}</span>
             </div>
             <div className="flex justify-between">
               <span>Total Informado:</span>
-              <span>R$ {totalInformado.toFixed(2)}</span>
+              <span>{formatCurrency(totalInformado)}</span>
             </div>
             <div className="flex justify-between">
               <span>Faltam:</span>
-              <span>R$ {faltam.toFixed(2)}</span>
+              <span>{formatCurrency(faltam)}</span>
             </div>
           </div>
 

@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Printer } from 'lucide-react';
 import { ItemCarrinho } from '@/types/carrinho';
+import { formatCurrency } from '@/lib/utils';
 
 interface ComprovanteVendaProps {
   isOpen: boolean;
@@ -78,8 +79,8 @@ const ComprovanteVenda: React.FC<ComprovanteVendaProps> = ({
               <div key={item.produto.id} className="grid grid-cols-4 gap-2">
                 <span className="text-xs truncate">{item.produto.nome}</span>
                 <span className="text-center">{item.quantidade}</span>
-                <span className="text-right">R$ {item.produto.preco.toFixed(2)}</span>
-                <span className="text-right">R$ {item.total.toFixed(2)}</span>
+                <span className="text-right">{formatCurrency(item.produto.preco)}</span>
+                <span className="text-right">{formatCurrency(item.total)}</span>
               </div>
             ))}
           </div>
@@ -89,7 +90,7 @@ const ComprovanteVenda: React.FC<ComprovanteVendaProps> = ({
           {/* Total */}
           <div className="flex justify-between font-bold">
             <span>Total:</span>
-            <span>R$ {subtotal.toFixed(2)}</span>
+            <span>{formatCurrency(subtotal)}</span>
           </div>
 
           <hr className="border-gray-300" />
@@ -98,7 +99,7 @@ const ComprovanteVenda: React.FC<ComprovanteVendaProps> = ({
           <div className="space-y-1">
             <p className="font-semibold">Forma de Pagamento:</p>
             {formasPagamento.map((forma, index) => (
-              <p key={index}>{forma.nome}: R$ {forma.valor.toFixed(2)}</p>
+              <p key={index}>{forma.nome}: {formatCurrency(forma.valor)}</p>
             ))}
           </div>
 
