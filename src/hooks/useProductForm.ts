@@ -87,7 +87,7 @@ export const useProductForm = ({ initialProduct, onSave, onOpenChange }: UseProd
         const updatedProduct: Produto = {
         ...initialProduct,
         nome: sanitizeInput(formData.nome),
-        codigo: sanitizeInput(formData.codigo).toUpperCase(),
+        codigo: sanitizeInput(formData.codigo).replace(/[^A-Za-z]/g, '').toUpperCase(),
         categoria: sanitizeInput(formData.categoria),
         preco: parseFloat(formData.preco) || 0,
         estoque: parseInt(formData.estoque) || 0,
@@ -100,7 +100,7 @@ export const useProductForm = ({ initialProduct, onSave, onOpenChange }: UseProd
     } else {
       const newProductData: NewProduto = {
         nome: sanitizeInput(formData.nome),
-        codigo: sanitizeInput(formData.codigo).toUpperCase(),
+        codigo: sanitizeInput(formData.codigo).replace(/[^A-Za-z]/g, '').toUpperCase(),
         categoria: sanitizeInput(formData.categoria),
         preco: parseFloat(formData.preco) || 0,
         estoque: parseInt(formData.estoque) || 0,
