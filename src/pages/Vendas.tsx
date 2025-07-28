@@ -41,6 +41,7 @@ const Vendas = () => {
 
   useEffect(() => {
     limparCarrinho();
+    setProdutoSelecionado(null);
   }, []);
 
   return (
