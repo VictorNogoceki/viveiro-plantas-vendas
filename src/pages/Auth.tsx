@@ -1,3 +1,4 @@
+import viveiroBackground from "@/assets/viveiro-background.jpg";
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -70,7 +71,17 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+    <div 
+      className="min-h-screen flex items-center justify-center p-4 relative"
+      style={{
+        backgroundImage: `url(${viveiroBackground})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
+      <div className="absolute inset-0 bg-black/40" />
+      <div className="relative z-10 w-full max-w-md">
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle>Sistema de Gestão</CardTitle>
@@ -129,7 +140,7 @@ export default function Auth() {
                     onChange={(e) => setNome(e.target.value)}
                     required
                   />
-                </div>
+      </div>
                 <div className="space-y-2">
                   <Label htmlFor="signup-email">Email</Label>
                   <Input
@@ -164,6 +175,7 @@ export default function Auth() {
           </Tabs>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }
