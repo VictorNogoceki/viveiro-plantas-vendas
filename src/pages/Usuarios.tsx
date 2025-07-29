@@ -108,27 +108,27 @@ const Usuarios = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-viveiro-gray">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Breadcrumb */}
-        <div className="text-sm text-muted-foreground mb-4">
+        <div className="text-sm text-viveiro-gray-dark/70 mb-4">
           Dashboard / Usuários
         </div>
 
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-              <Users className="h-8 w-8" />
+            <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2 text-viveiro-gray-dark">
+              <Users className="h-8 w-8 text-viveiro-green" />
               Usuários
             </h1>
-            <p className="text-muted-foreground mt-2">
+            <p className="text-viveiro-gray-dark/70 mt-2">
               Gerenciamento de Usuários
             </p>
           </div>
           <Button 
             onClick={() => setNovoUsuarioOpen(true)}
-            className="bg-orange-500 hover:bg-orange-600"
+            className="bg-viveiro-green hover:bg-viveiro-green/90 text-white"
           >
             <UserPlus className="h-4 w-4 mr-2" />
             Novo Usuário
