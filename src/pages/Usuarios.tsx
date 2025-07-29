@@ -108,7 +108,7 @@ const Usuarios = () => {
   };
 
   return (
-    <div className="min-h-screen bg-viveiro-gray">
+    <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Breadcrumb */}
         <div className="text-sm text-viveiro-gray-dark/70 mb-4">
