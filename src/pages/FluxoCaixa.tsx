@@ -59,12 +59,42 @@ const FluxoCaixa = () => {
   ]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [dataInicio, setDataInicio] = useState("2025-06-01");
+  const [dataFim, setDataFim] = useState("2025-06-14");
+  const [formaPagamentoFiltro, setFormaPagamentoFiltro] = useState("todos");
 
-  const entradas = registros
+  // Função para filtrar registros
+  const filtrarRegistros = () => {
+    return registros.filter(registro => {
+      // Converter data do registro para comparação
+      const [dataParte] = registro.data.split(' ');
+      const [dia, mes, ano] = dataParte.split('/');
+      const dataRegistro = new Date(parseInt(ano), parseInt(mes) - 1, parseInt(dia));
+      
+      // Converter datas dos filtros
+      const dataInicioFiltro = new Date(dataInicio);
+      const dataFimFiltro = new Date(dataFim);
+      
+      // Verificar se a data está no período
+      const dentroDataPeriodo = dataRegistro >= dataInicioFiltro && dataRegistro <= dataFimFiltro;
+      
+      // Verificar forma de pagamento
+      const formaPagamentoMatch = formaPagamentoFiltro === "todos" || 
+        (formaPagamentoFiltro === "dinheiro" && registro.formaPagamento === "Dinheiro") ||
+        (formaPagamentoFiltro === "credito" && registro.formaPagamento === "Crédito") ||
+        (formaPagamentoFiltro === "debito" && registro.formaPagamento === "Débito");
+      
+      return dentroDataPeriodo && formaPagamentoMatch;
+    });
+  };
+
+  const registrosFiltrados = filtrarRegistros();
+
+  const entradas = registrosFiltrados
     .filter(r => r.tipo === "Entrada")
     .reduce((sum, r) => sum + r.valor, 0);
 
-  const saidas = registros
+  const saidas = registrosFiltrados
     .filter(r => r.tipo === "Saída")
     .reduce((sum, r) => sum + r.valor, 0);
 
@@ -142,22 +172,24 @@ const FluxoCaixa = () => {
           <div className="flex items-center gap-2">
             <input 
               type="date" 
-              defaultValue="2025-06-01"
+              value={dataInicio}
+              onChange={(e) => setDataInicio(e.target.value)}
               className="border border-gray-300 rounded px-3 py-2 text-sm"
             />
             <span className="text-gray-400">—</span>
             <input 
               type="date" 
-              defaultValue="2025-06-14"
+              value={dataFim}
+              onChange={(e) => setDataFim(e.target.value)}
               className="border border-gray-300 rounded px-3 py-2 text-sm"
             />
           </div>
-          <Select defaultValue="forma-pagamento">
+          <Select value={formaPagamentoFiltro} onValueChange={setFormaPagamentoFiltro}>
             <SelectTrigger className="w-[180px] border-gray-300">
               <SelectValue placeholder="Forma de pagamento" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="forma-pagamento">Forma de pagamento</SelectItem>
+              <SelectItem value="todos">Todas as formas</SelectItem>
               <SelectItem value="dinheiro">Dinheiro</SelectItem>
               <SelectItem value="credito">Crédito</SelectItem>
               <SelectItem value="debito">Débito</SelectItem>
@@ -193,7 +225,7 @@ const FluxoCaixa = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {registros.map((registro) => (
+              {registrosFiltrados.map((registro) => (
                 <TableRow key={registro.id} className="border-b border-gray-100 hover:bg-gray-50">
                   <TableCell className="py-4 px-6 text-gray-700 text-sm">
                     {registro.data}
