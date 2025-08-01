@@ -136,10 +136,6 @@ const FluxoCaixa = () => {
             <Plus className="h-4 w-4 mr-2" />
             Novo Registro
           </Button>
-          <Button variant="outline" className="border-gray-300">
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Sincronizar Vendas
-          </Button>
         </div>
 
         <div className="flex items-center gap-4">
