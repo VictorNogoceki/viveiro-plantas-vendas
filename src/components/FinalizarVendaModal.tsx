@@ -30,10 +30,10 @@ const FinalizarVendaModal: React.FC<FinalizarVendaModalProps> = ({
   subtotal
 }) => {
   const [formasPagamento, setFormasPagamento] = useState<FormaPagamento[]>([
-    { id: 'dinheiro', nome: 'Dinheiro', selecionada: true, valor: subtotal, valorTexto: subtotal.toFixed(2), editando: false },
-    { id: 'cartao-credito', nome: 'Cartão de Crédito', selecionada: false, valor: 0, valorTexto: '0.00', editando: false },
-    { id: 'cartao-debito', nome: 'Cartão de Débito', selecionada: false, valor: 0, valorTexto: '0.00', editando: false },
-    { id: 'pix', nome: 'PIX', selecionada: false, valor: 0, valorTexto: '0.00', editando: false }
+    { id: 'dinheiro', nome: 'Dinheiro', selecionada: true, valor: subtotal, valorTexto: subtotal.toFixed(2).replace('.', ','), editando: false },
+    { id: 'cartao-credito', nome: 'Cartão de Crédito', selecionada: false, valor: 0, valorTexto: '0,00', editando: false },
+    { id: 'cartao-debito', nome: 'Cartão de Débito', selecionada: false, valor: 0, valorTexto: '0,00', editando: false },
+    { id: 'pix', nome: 'PIX', selecionada: false, valor: 0, valorTexto: '0,00', editando: false }
   ]);
 
   // Recalcula os valores quando o subtotal muda, mas apenas se não estiver editando
@@ -43,7 +43,7 @@ const FinalizarVendaModal: React.FC<FinalizarVendaModalProps> = ({
       if (selecionadas.length === 1) {
         return prev.map(forma => {
           if (forma.selecionada && !forma.editando) {
-            return { ...forma, valor: subtotal, valorTexto: subtotal.toFixed(2) };
+            return { ...forma, valor: subtotal, valorTexto: subtotal.toFixed(2).replace('.', ',') };
           }
           return forma;
         });
@@ -62,7 +62,7 @@ const FinalizarVendaModal: React.FC<FinalizarVendaModalProps> = ({
     setFormasPagamento(prev => {
       const updated = prev.map(forma => 
         forma.id === id 
-          ? { ...forma, selecionada: checked, valor: 0, valorTexto: '0.00', editando: false }
+          ? { ...forma, selecionada: checked, valor: 0, valorTexto: '0,00', editando: false }
           : forma
       );
       
@@ -71,7 +71,7 @@ const FinalizarVendaModal: React.FC<FinalizarVendaModalProps> = ({
       if (selecionadas.length === 1) {
         return updated.map(forma => 
           forma.selecionada 
-            ? { ...forma, valor: subtotal, valorTexto: subtotal.toFixed(2) }
+            ? { ...forma, valor: subtotal, valorTexto: subtotal.toFixed(2).replace('.', ',') }
             : forma
         );
       }
@@ -117,7 +117,7 @@ const FinalizarVendaModal: React.FC<FinalizarVendaModalProps> = ({
         return {
           ...forma,
           valor: valorNumerico,
-          valorTexto: valorNumerico.toFixed(2),
+          valorTexto: valorNumerico.toFixed(2).replace('.', ','),
           editando: false
         };
       }
@@ -137,11 +137,8 @@ const FinalizarVendaModal: React.FC<FinalizarVendaModalProps> = ({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-md">
-        <DialogHeader className="flex flex-row items-center justify-between">
+        <DialogHeader>
           <DialogTitle>Finalizar Venda</DialogTitle>
-          <Button variant="ghost" size="sm" onClick={onClose}>
-            <X className="h-4 w-4" />
-          </Button>
         </DialogHeader>
         
         <div className="space-y-6">
@@ -185,7 +182,7 @@ const FinalizarVendaModal: React.FC<FinalizarVendaModalProps> = ({
                   </label>
                   <Input
                     type="text"
-                    value={forma.selecionada ? forma.valorTexto : '0.00'}
+                    value={forma.selecionada ? forma.valorTexto : '0,00'}
                     onChange={(e) => handleValorChange(forma.id, e.target.value)}
                     onFocus={(e) => {
                       handleValorFocus(forma.id);
