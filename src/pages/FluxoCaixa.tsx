@@ -1,62 +1,22 @@
 import { useState } from "react";
-import { Plus, RefreshCw, ChevronDown, Trash2 } from "lucide-react";
+import { Plus, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { getFluxoCaixa, deleteFluxoCaixaRegistro } from "@/services/fluxoCaixaService";
+import { useToast } from "@/hooks/use-toast";
 import NovoRegistroCaixaModal from "@/components/NovoRegistroCaixaModal";
 
 const FluxoCaixa = () => {
-  const [registros, setRegistros] = useState([
-    {
-      id: 1,
-      data: "10/06/2025 19:27",
-      descricao: "Entrada em dinheiro da venda #a3d97cb3",
-      tipo: "Entrada",
-      formaPagamento: "Dinheiro",
-      valor: 4.90
-    },
-    {
-      id: 2,
-      data: "10/06/2025 19:27",
-      descricao: "Entrada em cartão de crédito da venda #a3d97cb3",
-      tipo: "Entrada",
-      formaPagamento: "Crédito",
-      valor: 50.00
-    },
-    {
-      id: 3,
-      data: "10/06/2025 19:27",
-      descricao: "Troco em dinheiro da venda #a3d97cb3",
-      tipo: "Saída",
-      formaPagamento: "Dinheiro",
-      valor: 0.00
-    },
-    {
-      id: 4,
-      data: "10/06/2025 19:19",
-      descricao: "Entrada em dinheiro da venda #9916dcda",
-      tipo: "Entrada",
-      formaPagamento: "Dinheiro",
-      valor: 5.00
-    },
-    {
-      id: 5,
-      data: "10/06/2025 19:19",
-      descricao: "Entrada em cartão de crédito da venda #9916dcda",
-      tipo: "Entrada",
-      formaPagamento: "Crédito",
-      valor: 20.90
-    },
-    {
-      id: 6,
-      data: "10/06/2025 19:18",
-      descricao: "Abertura de caixa",
-      tipo: "Entrada",
-      formaPagamento: "-",
-      valor: 200.00
-    }
-  ]);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const { data: registros = [], isLoading } = useQuery({
+    queryKey: ['fluxo-caixa'],
+    queryFn: getFluxoCaixa,
+  });
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [dataInicio, setDataInicio] = useState("2025-06-01");
@@ -66,23 +26,28 @@ const FluxoCaixa = () => {
   // Função para filtrar registros
   const filtrarRegistros = () => {
     return registros.filter(registro => {
-      // Converter data do registro para comparação
-      const [dataParte] = registro.data.split(' ');
-      const [dia, mes, ano] = dataParte.split('/');
-      const dataRegistro = new Date(parseInt(ano), parseInt(mes) - 1, parseInt(dia));
+      // Converter data do registro para comparação (formato ISO do banco)
+      const dataRegistro = new Date(registro.data || '');
       
       // Converter datas dos filtros
       const dataInicioFiltro = new Date(dataInicio);
       const dataFimFiltro = new Date(dataFim);
+      dataFimFiltro.setHours(23, 59, 59, 999); // Incluir até o final do dia
       
       // Verificar se a data está no período
       const dentroDataPeriodo = dataRegistro >= dataInicioFiltro && dataRegistro <= dataFimFiltro;
       
+      // Extrair forma de pagamento da descrição
+      const descricao = registro.descricao.toLowerCase();
+      let formaPagamentoRegistro = "";
+      
+      if (descricao.includes("dinheiro")) formaPagamentoRegistro = "dinheiro";
+      else if (descricao.includes("crédito") || descricao.includes("credito")) formaPagamentoRegistro = "credito";
+      else if (descricao.includes("débito") || descricao.includes("debito")) formaPagamentoRegistro = "debito";
+      
       // Verificar forma de pagamento
       const formaPagamentoMatch = formaPagamentoFiltro === "todos" || 
-        (formaPagamentoFiltro === "dinheiro" && registro.formaPagamento === "Dinheiro") ||
-        (formaPagamentoFiltro === "credito" && registro.formaPagamento === "Crédito") ||
-        (formaPagamentoFiltro === "debito" && registro.formaPagamento === "Débito");
+        formaPagamentoFiltro === formaPagamentoRegistro;
       
       return dentroDataPeriodo && formaPagamentoMatch;
     });
@@ -91,21 +56,34 @@ const FluxoCaixa = () => {
   const registrosFiltrados = filtrarRegistros();
 
   const entradas = registrosFiltrados
-    .filter(r => r.tipo === "Entrada")
+    .filter(r => r.tipo === "entrada")
     .reduce((sum, r) => sum + r.valor, 0);
 
   const saidas = registrosFiltrados
-    .filter(r => r.tipo === "Saída")
+    .filter(r => r.tipo === "saida")
     .reduce((sum, r) => sum + r.valor, 0);
 
   const saldo = entradas - saidas;
 
-  const removeRegistro = (id: number) => {
-    setRegistros(registros.filter(r => r.id !== id));
+  const removeRegistro = async (id: string) => {
+    try {
+      await deleteFluxoCaixaRegistro(id);
+      await queryClient.invalidateQueries({ queryKey: ['fluxo-caixa'] });
+      toast({
+        title: "Registro removido",
+        description: "O registro foi removido com sucesso.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Erro ao remover registro",
+        description: error.message || "Não foi possível remover o registro.",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleNovoRegistro = (novoRegistro: any) => {
-    setRegistros([novoRegistro, ...registros]);
+  const handleNovoRegistro = async () => {
+    await queryClient.invalidateQueries({ queryKey: ['fluxo-caixa'] });
   };
 
   return (
@@ -225,51 +203,77 @@ const FluxoCaixa = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {registrosFiltrados.map((registro) => (
-                <TableRow key={registro.id} className="border-b border-gray-100 hover:bg-gray-50">
-                  <TableCell className="py-4 px-6 text-gray-700 text-sm">
-                    {registro.data}
-                  </TableCell>
-                  <TableCell className="py-4 px-6 text-gray-700 text-sm">
-                    {registro.descricao}
-                  </TableCell>
-                  <TableCell className="py-4 px-6">
-                    <span className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${
-                      registro.tipo === "Entrada" 
-                        ? "bg-green-100 text-green-800" 
-                        : "bg-red-100 text-red-800"
-                    }`}>
-                      {registro.tipo === "Entrada" ? "↑" : "↓"} {registro.tipo}
-                    </span>
-                  </TableCell>
-                  <TableCell className="py-4 px-6">
-                    <span className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${
-                      registro.formaPagamento === "Dinheiro" 
-                        ? "bg-green-100 text-green-800" 
-                        : registro.formaPagamento === "Crédito"
-                        ? "bg-gray-100 text-gray-800"
-                        : "bg-gray-100 text-gray-800"
-                    }`}>
-                      {registro.formaPagamento}
-                    </span>
-                  </TableCell>
-                  <TableCell className="py-4 px-6 text-right font-medium">
-                    <span className={registro.tipo === "Entrada" ? "text-viveiro-green" : "text-red-600"}>
-                      {registro.tipo === "Entrada" ? "+" : "-"} R$ {registro.valor.toFixed(2).replace('.', ',')}
-                    </span>
-                  </TableCell>
-                  <TableCell className="py-4 px-6 text-center">
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => removeRegistro(registro.id)}
-                      className="text-red-600 border-red-200 hover:bg-red-50"
-                    >
-                      Remover
-                    </Button>
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center py-8">
+                    Carregando registros...
                   </TableCell>
                 </TableRow>
-              ))}
+              ) : registrosFiltrados.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center py-8">
+                    Nenhum registro encontrado no período selecionado.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                registrosFiltrados.map((registro) => {
+                  const dataFormatada = new Date(registro.data || '').toLocaleString('pt-BR');
+                  const tipoCapitalizado = registro.tipo === "entrada" ? "Entrada" : "Saída";
+                  
+                  // Extrair forma de pagamento da descrição
+                  let formaPagamento = "-";
+                  const descricao = registro.descricao.toLowerCase();
+                  if (descricao.includes("dinheiro")) formaPagamento = "Dinheiro";
+                  else if (descricao.includes("crédito") || descricao.includes("credito")) formaPagamento = "Crédito";
+                  else if (descricao.includes("débito") || descricao.includes("debito")) formaPagamento = "Débito";
+                  
+                  return (
+                    <TableRow key={registro.id} className="border-b border-gray-100 hover:bg-gray-50">
+                      <TableCell className="py-4 px-6 text-gray-700 text-sm">
+                        {dataFormatada}
+                      </TableCell>
+                      <TableCell className="py-4 px-6 text-gray-700 text-sm">
+                        {registro.descricao}
+                      </TableCell>
+                      <TableCell className="py-4 px-6">
+                        <span className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${
+                          registro.tipo === "entrada" 
+                            ? "bg-green-100 text-green-800" 
+                            : "bg-red-100 text-red-800"
+                        }`}>
+                          {registro.tipo === "entrada" ? "↑" : "↓"} {tipoCapitalizado}
+                        </span>
+                      </TableCell>
+                      <TableCell className="py-4 px-6">
+                        <span className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${
+                          formaPagamento === "Dinheiro" 
+                            ? "bg-green-100 text-green-800" 
+                            : formaPagamento === "Crédito"
+                            ? "bg-gray-100 text-gray-800"
+                            : "bg-gray-100 text-gray-800"
+                        }`}>
+                          {formaPagamento}
+                        </span>
+                      </TableCell>
+                      <TableCell className="py-4 px-6 text-right font-medium">
+                        <span className={registro.tipo === "entrada" ? "text-viveiro-green" : "text-red-600"}>
+                          {registro.tipo === "entrada" ? "+" : "-"} R$ {registro.valor.toFixed(2).replace('.', ',')}
+                        </span>
+                      </TableCell>
+                      <TableCell className="py-4 px-6 text-center">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => removeRegistro(registro.id!)}
+                          className="text-red-600 border-red-200 hover:bg-red-50"
+                        >
+                          Remover
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
+              )}
             </TableBody>
           </Table>
         </CardContent>

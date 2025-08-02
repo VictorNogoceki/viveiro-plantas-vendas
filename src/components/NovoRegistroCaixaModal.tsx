@@ -8,11 +8,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { CashFlowSchema, sanitizeInput } from "@/lib/validation";
 import { logSecurityEvent } from "@/lib/security";
 import { useToast } from "@/hooks/use-toast";
+import { createFluxoCaixaRegistro } from "@/services/fluxoCaixaService";
 
 interface NovoRegistroCaixaModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: (registro: any) => void;
+  onConfirm: () => void;
 }
 
 const NovoRegistroCaixaModal = ({ isOpen, onClose, onConfirm }: NovoRegistroCaixaModalProps) => {
@@ -46,7 +47,7 @@ const NovoRegistroCaixaModal = ({ isOpen, onClose, onConfirm }: NovoRegistroCaix
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!validateForm()) {
       toast({
         title: "Erro de Validação",
@@ -56,26 +57,39 @@ const NovoRegistroCaixaModal = ({ isOpen, onClose, onConfirm }: NovoRegistroCaix
       return;
     }
 
-    const novoRegistro = {
-      id: Date.now(),
-      data: new Date(data).toLocaleString('pt-BR'),
-      descricao: sanitizeInput(descricao),
-      tipo: tipoMovimentacao === "entrada" ? "Entrada" : "Saída",
-      formaPagamento: formaPagamento,
-      valor: parseFloat(valor.replace(',', '.')) || 0
-    };
+    try {
+      const novoRegistro = {
+        valor: parseFloat(valor.replace(',', '.')) || 0,
+        tipo: tipoMovimentacao as 'entrada' | 'saida',
+        descricao: sanitizeInput(descricao),
+        origem: 'manual'
+      };
 
-    console.log("Novo registro:", novoRegistro);
-    onConfirm(novoRegistro);
-    
-    // Reset form
-    setTipoMovimentacao("");
-    setData(new Date().toISOString().slice(0, 16));
-    setDescricao("");
-    setValor("");
-    setFormaPagamento("");
-    setErrors({});
-    onClose();
+      await createFluxoCaixaRegistro(novoRegistro);
+      
+      toast({
+        title: "Registro criado",
+        description: "O registro foi adicionado com sucesso ao fluxo de caixa.",
+      });
+
+      onConfirm();
+      
+      // Reset form
+      setTipoMovimentacao("");
+      setData(new Date().toISOString().slice(0, 16));
+      setDescricao("");
+      setValor("");
+      setFormaPagamento("");
+      setErrors({});
+      onClose();
+
+    } catch (error: any) {
+      toast({
+        title: "Erro ao criar registro",
+        description: error.message || "Não foi possível criar o registro.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleInputChange = (field: string, value: string) => {

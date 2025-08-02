@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { createMovimentacao } from "@/services/movimentacaoEstoqueService";
+import { createVendaCompleta } from "@/services/vendasServiceComplete";
 import { Produto } from "@/types/produto";
 import { ItemCarrinho } from "@/types/carrinho";
 import { formatCurrency } from "@/lib/utils";
@@ -90,9 +91,15 @@ export const useVendas = (produtos: Produto[] = []) => {
   };
 
   const confirmarFinalizacao = async (formasPagamento: { nome: string; valor: number }[]) => {
-    const vendaId = `${Date.now().toString().slice(-6)}`;
-
     try {
+      // Criar a venda completa no banco de dados (inclui venda, itens e fluxo de caixa)
+      const vendaId = await createVendaCompleta(
+        carrinho,
+        subtotal,
+        formasPagamento
+      );
+
+      // Criar movimentações de estoque
       const movimentacoesPromises = carrinho.map(item =>
         createMovimentacao({
           produtoId: item.produto.id,
@@ -116,7 +123,9 @@ export const useVendas = (produtos: Produto[] = []) => {
         description: `Venda realizada com sucesso! Total: ${formatCurrency(subtotal)}`,
       });
 
+      // Invalidar queries para atualizar dados
       await queryClient.invalidateQueries({ queryKey: ['produtos'] });
+      await queryClient.invalidateQueries({ queryKey: ['fluxo-caixa'] });
 
       setCarrinho([]);
       setClienteSearch("");
@@ -127,7 +136,7 @@ export const useVendas = (produtos: Produto[] = []) => {
       console.error("Erro ao finalizar venda:", error);
       toast({
         title: "Erro ao finalizar venda",
-        description: error.message || "Não foi possível atualizar o estoque.",
+        description: error.message || "Não foi possível processar a venda.",
         variant: "destructive",
       });
     }

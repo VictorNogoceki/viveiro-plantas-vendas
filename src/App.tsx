@@ -18,6 +18,7 @@ import Pedidos from "./pages/Pedidos";
 import Vendas from "./pages/Vendas";
 import Relatorios from "./pages/Relatorios";
 import FluxoCaixa from "./pages/FluxoCaixa";
+import NotasFiscais from "./pages/NotasFiscais";
 import Usuarios from "./pages/Usuarios";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
@@ -63,6 +64,7 @@ const AppContent = () => {
               <Route path="/vendas" element={<Vendas />} />
               <Route path="/relatorios" element={<Relatorios />} />
               <Route path="/fluxo-caixa" element={<FluxoCaixa />} />
+              <Route path="/notas-fiscais" element={<NotasFiscais />} />
               <Route path="/usuarios" element={<Usuarios />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
