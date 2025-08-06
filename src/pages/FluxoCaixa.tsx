@@ -16,11 +16,14 @@ const FluxoCaixa = () => {
   const { data: registros = [], isLoading } = useQuery({
     queryKey: ['fluxo-caixa'],
     queryFn: getFluxoCaixa,
+    refetchOnWindowFocus: true,
+    staleTime: 0,
+    refetchInterval: 5000, // Atualiza a cada 5 segundos
   });
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [dataInicio, setDataInicio] = useState("2025-06-01");
-  const [dataFim, setDataFim] = useState("2025-06-14");
+  const [dataInicio, setDataInicio] = useState(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]); // 30 dias atrás
+  const [dataFim, setDataFim] = useState(new Date().toISOString().split('T')[0]); // hoje
   const [formaPagamentoFiltro, setFormaPagamentoFiltro] = useState("todos");
 
   // Função para filtrar registros
