@@ -3,52 +3,47 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, BarChart, Bar, AreaChart, Area } from "recharts";
+import { useQuery } from "@tanstack/react-query";
+import { 
+  getDashboardStats, 
+  getVendasEvolution, 
+  getProdutosMaisVendidos, 
+  getEstoqueBaixo, 
+  getTopClientes, 
+  getUltimosPedidos 
+} from "@/services/dashboardService";
 
 const Index = () => {
-  // Dados mockados para demonstração
-  const vendasData = [
-    { data: "01/06", vendas: 1200 },
-    { data: "02/06", vendas: 1800 },
-    { data: "03/06", vendas: 2400 },
-    { data: "04/06", vendas: 1600 },
-    { data: "05/06", vendas: 2800 },
-    { data: "06/06", vendas: 3200 },
-    { data: "07/06", vendas: 2900 },
-  ];
+  // Busca dados reais do sistema
+  const { data: stats } = useQuery({
+    queryKey: ['dashboard-stats'],
+    queryFn: getDashboardStats,
+  });
 
-  const produtosMaisVendidos = [
-    { produto: "Rosa Vermelha", vendas: 45 },
-    { produto: "Violeta", vendas: 38 },
-    { produto: "Orquídea", vendas: 32 },
-    { produto: "Suculenta Mix", vendas: 28 },
-    { produto: "Manjericão", vendas: 24 },
-  ];
+  const { data: vendasData = [] } = useQuery({
+    queryKey: ['vendas-evolution'],
+    queryFn: getVendasEvolution,
+  });
 
-  const novosClientes = [
-    { periodo: "Sem 1", clientes: 12 },
-    { periodo: "Sem 2", clientes: 18 },
-    { periodo: "Sem 3", clientes: 15 },
-    { periodo: "Sem 4", clientes: 22 },
-  ];
+  const { data: produtosMaisVendidos = [] } = useQuery({
+    queryKey: ['produtos-mais-vendidos'],
+    queryFn: getProdutosMaisVendidos,
+  });
 
-  const estoquesBaixos = [
-    { produto: "Rosa Branca", estoque: 3, minimo: 10 },
-    { produto: "Girassol", estoque: 5, minimo: 15 },
-    { produto: "Fertilizante NPK", estoque: 2, minimo: 8 },
-  ];
+  const { data: estoquesBaixos = [] } = useQuery({
+    queryKey: ['estoque-baixo'],
+    queryFn: getEstoqueBaixo,
+  });
 
-  const ultimosPedidos = [
-    { id: "001", cliente: "Maria Santos", valor: 89.90, status: "Concluído", data: "08/06/2025" },
-    { id: "002", cliente: "João Silva", valor: 156.50, status: "Pendente", data: "08/06/2025" },
-    { id: "003", cliente: "Ana Costa", valor: 67.30, status: "Concluído", data: "07/06/2025" },
-    { id: "004", cliente: "Pedro Oliveira", valor: 234.80, status: "Em andamento", data: "07/06/2025" },
-  ];
+  const { data: topClientes = [] } = useQuery({
+    queryKey: ['top-clientes'],
+    queryFn: getTopClientes,
+  });
 
-  const topClientes = [
-    { nome: "Maria Santos", compras: "R$ 1.245,90", pedidos: 8 },
-    { nome: "João Silva", compras: "R$ 987,60", pedidos: 6 },
-    { nome: "Ana Costa", compras: "R$ 756,40", pedidos: 5 },
-  ];
+  const { data: ultimosPedidos = [] } = useQuery({
+    queryKey: ['ultimos-pedidos'],
+    queryFn: getUltimosPedidos,
+  });
 
   const chartConfig = {
     vendas: {
@@ -84,9 +79,11 @@ const Index = () => {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-viveiro-green">R$ 15.900</div>
+            <div className="text-2xl font-bold text-viveiro-green">
+              R$ {stats?.totalVendas.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) || '0,00'}
+            </div>
             <p className="text-xs text-muted-foreground">
-              +12% em relação ao mês anterior
+              Vendas realizadas este mês
             </p>
           </CardContent>
         </Card>
@@ -97,9 +94,9 @@ const Index = () => {
             <ShoppingCart className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-viveiro-green">127</div>
+            <div className="text-2xl font-bold text-viveiro-green">{stats?.totalPedidos || 0}</div>
             <p className="text-xs text-muted-foreground">
-              +8% em relação ao mês anterior
+              Pedidos realizados este mês
             </p>
           </CardContent>
         </Card>
@@ -110,9 +107,9 @@ const Index = () => {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-viveiro-green">89</div>
+            <div className="text-2xl font-bold text-viveiro-green">{stats?.totalClientes || 0}</div>
             <p className="text-xs text-muted-foreground">
-              +15% em relação ao mês anterior
+              Clientes cadastrados no sistema
             </p>
           </CardContent>
         </Card>
@@ -123,9 +120,9 @@ const Index = () => {
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-viveiro-green">456</div>
+            <div className="text-2xl font-bold text-viveiro-green">{stats?.totalProdutos || 0}</div>
             <p className="text-xs text-muted-foreground">
-              Valor total: R$ 28.450
+              Valor total: R$ {stats?.valorEstoque.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) || '0,00'}
             </p>
           </CardContent>
         </Card>
@@ -187,33 +184,24 @@ const Index = () => {
       </div>
 
       {/* Novos Clientes */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Users className="h-5 w-5" />
-            Novos Clientes por Semana
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ChartContainer config={chartConfig} className="h-[200px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={novosClientes}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="periodo" />
-                <YAxis />
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Area 
-                  type="monotone" 
-                  dataKey="clientes" 
-                  stroke="var(--color-clientes)" 
-                  fill="var(--color-clientes)"
-                  fillOpacity={0.3}
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </ChartContainer>
-        </CardContent>
-      </Card>
+        {vendasData.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5" />
+                Resumo de Vendas (Últimos 7 dias)
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center p-4">
+                <div className="text-3xl font-bold text-viveiro-green">
+                  R$ {vendasData.reduce((acc, item) => acc + item.vendas, 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                </div>
+                <p className="text-muted-foreground">Total vendido nos últimos 7 dias</p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
       {/* Seção Inferior */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -281,15 +269,9 @@ const Index = () => {
                 {ultimosPedidos.map((pedido) => (
                   <TableRow key={pedido.id}>
                     <TableCell className="font-medium">{pedido.cliente}</TableCell>
-                    <TableCell>R$ {pedido.valor}</TableCell>
+                    <TableCell>R$ {pedido.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</TableCell>
                     <TableCell>
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        pedido.status === 'Concluído' 
-                          ? 'bg-green-100 text-green-800'
-                          : pedido.status === 'Pendente'
-                          ? 'bg-yellow-100 text-yellow-800'
-                          : 'bg-blue-100 text-blue-800'
-                      }`}>
+                      <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
                         {pedido.status}
                       </span>
                     </TableCell>
